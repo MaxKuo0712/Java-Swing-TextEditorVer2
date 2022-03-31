@@ -1,0 +1,59 @@
+TextEditor Database
+
+Table：使用者資訊、筆記本資料、帳號密碼表
+使用者資訊：客戶編號(自動產生)、姓名、性別、年齡、生日、mail、電話
+帳號密碼表：客戶編號、帳號、密碼
+
+create table UserInfo (
+	UserID int not null AUTO_INCREMENT PRIMARY KEY,
+	UserName varchar(100) UNIQUE not null,
+	UserGender ENUM('男','女') not null,
+	UserAge int not null,
+	UserBirth datetime not null,
+	UserEmail varchar(200) UNIQUE not null,
+	UserTel varchar(100) not null,
+	CreateTime datetime default sysdate(),
+	ReviseTime datetime default null,
+	ReviseName varchar(100) default null
+)
+
+ALTER TABLE userinfo
+ADD CHECK (UserAge > 0 and UserAge < 150);
+
+ALTER TABLE userinfo
+ADD CHECK (UserBirth < sysdate());
+
+insert into UserInfo (UserName, UserGender, UserAge, UserBirth, UserEmail, UserTel)
+values ('Max', '男', 28, '1993-07-12', 'maxkuo712Gmail.com', '0955820712')
+
+create table Account (
+	AccountID int not null AUTO_INCREMENT PRIMARY KEY,
+	UserID int UNIQUE not null,
+	UserName varchar(100) UNIQUE not null,
+	Account varchar(100) UNIQUE not null,
+	Passwd varchar(100) not null,
+	CreateTime datetime default sysdate(),
+	ReviseTime datetime default null,
+	ReviseName varchar(100) default null
+)
+
+ALTER TABLE Account 
+ADD FOREIGN KEY (UserID) REFERENCES userinfo(UserID)
+
+ALTER TABLE Account 
+ADD FOREIGN KEY (UserName) REFERENCES userinfo(UserName)
+
+insert into Account (UserID, UserName, Account, Passwd)
+values ('1', 'Max', 'maxkuo712', '123456')
+
+
+
+
+
+
+
+
+
+
+
+
