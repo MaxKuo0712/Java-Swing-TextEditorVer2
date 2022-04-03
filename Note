@@ -6,8 +6,8 @@ Table：使用者資訊、筆記本資料、帳號密碼表
 筆記本資料：筆記檔案編號、Account、筆記頁籤名稱、筆記頁籤內容
 
 create table UserInfo (
-	UserID int not null AUTO_INCREMENT PRIMARY KEY,
 	UserName varchar(100) UNIQUE not null,
+	UserIdNumber varchar(50) UNIQUE not null PRIMARY KEY,
 	UserGender ENUM('男','女') not null,
 	UserAge int DEFAULT TIMESTAMPDIFF(YEAR, UserBirth, SYSDATE()),
 	UserBirth date not null,
@@ -24,13 +24,12 @@ ALTER UserAge SET DEFAULT TIMESTAMPDIFF(YEAR, UserBirth, SYSDATE())
 ALTER TABLE userinfo
 ADD CHECK (UserBirth < sysdate());
 
-insert into UserInfo (UserName, UserGender, UserBirth, UserEmail, UserTel)
-values ('Max', '男', '1993-07-12', 'maxkuo712Gmail.com', '0955820712')
+insert into UserInfo (UserName, UserIdNumber, UserGender, UserBirth, UserEmail, UserTel)
+values ('Max', 'S124433061', '男', '1993-07-12', 'maxkuo712Gmail.com', '0955820712')
 
 create table Account (
-	AccountID int not null AUTO_INCREMENT PRIMARY KEY,
-	UserID int UNIQUE not null,
 	UserName varchar(100) UNIQUE not null,
+	UserIdNumber varchar(50) UNIQUE not null PRIMARY KEY,
 	Account varchar(100) UNIQUE not null,
 	Passwd varchar(100) not null,
 	CreateTime datetime default sysdate(),
@@ -47,7 +46,10 @@ ADD FOREIGN KEY (UserName) REFERENCES userinfo(UserName)
 insert into Account (UserID, UserName, Account, Passwd)
 values ('1', 'Max', 'maxkuo712', '123456')
 
-
+insert into Account (UserID, UserName, Account, Passwd)
+select u.UserID, u.UserName, 'maxkuo712', 'as13456'
+from userinfo as u
+where UserName = '郭哲嘉'
 
 
 

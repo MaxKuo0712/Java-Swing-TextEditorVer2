@@ -4,11 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.Properties;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -26,6 +21,10 @@ public class Login extends JFrame {
 	private JButton loginButton, registerButton;
 	private JLabel userAccountLabel, userPasswordLabel;
 	private JPanel body, footer;
+	private SQLQuery sqlQuery;
+	private String DB;
+	private String Account; // 取得輸入的帳號
+	private String Password; // 取得輸入的密碼
 	
 	public Login() {
 		// 建立視窗
@@ -66,7 +65,7 @@ public class Login extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (checkLogin()) {
 					new TextEditor(); // 開啟主要程式
-					System.exit(0); // 登入成功進入主要程式後關閉
+					dispose(); // 登入成功進入主要程式後關閉
 				}
 			}
 		});
@@ -81,14 +80,19 @@ public class Login extends JFrame {
 			}
 		});
 		
+		DB = "MiddleProject";
+		Account = "root"; // 取得輸入的帳號
+		Password = ""; // 取得輸入的密碼
+		sqlQuery = new SQLQuery(DB, Account, Password);
+		
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 	
 	private Boolean checkLogin() {
-		String Account = getUserAccount(); // 取得輸入的帳號
-		String Password = getUserPassword(); // 取得輸入的密碼
-		int checkResult = checkLogin(Account, Password);
+		String Account = getUserAccount();
+		String Password = getUserPassword();
+		int checkResult = sqlQuery.getSqlLoginResult(Account, Password);
 		
 		if (checkResult == 0) {
 			JOptionPane.showMessageDialog(null, "帳號不存在");
@@ -113,36 +117,6 @@ public class Login extends JFrame {
 	
 	private String getUserPassword() {
 		return String.valueOf(userPassword.getPassword());
-	}
-	
-	// SQL 檢查輸入帳號密碼是否正確
-	private int checkLogin(String account, String passwd) {
-		Properties prop = new Properties();
-		prop.put("user", "root");
-		prop.put("password", "");
-		String DB = "MiddleProject";
-		
-		String sql = "select account, passwd from account where account = ?";
-		
-		try(Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/".concat(DB), prop)) {
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, account);
-			
-			ResultSet result = ps.executeQuery();
-			if(result.next()) {
-				String hashpasswd = result.getString("Passwd");
-				if (BCrypt.checkpw(passwd, hashpasswd)) {
-					return 1; // 登入成功
-				} else {
-					return 2; // 密碼錯誤
-				}
-			} else {
-				return 0; // 帳號不存在
-			}
-		} catch (Exception e) {
-			System.out.println(e.toString());
-			return 4; // 出事
-		}
 	}
 
 	public static void main(String[] args) {

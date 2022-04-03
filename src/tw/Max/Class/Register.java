@@ -5,6 +5,9 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
@@ -17,6 +20,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -26,14 +30,18 @@ import org.jdatepicker.JDatePicker;
 
 public class Register extends JFrame {
 	private JPanel headerPanel, bodyPanel, footerPanel;
-	private JPanel namePanel, accountPanel, passwdPanel, genderPanel, birthPanel, emailPanel, telPanel;
-	private JLabel nameLabel, accountLabel, passwdLabel, genderLabel, birthLabel, emailLabel, telLabel;
-	private JTextField nameField, accountField, emailField, telField;
+	private JPanel namePanel, idPanel, accountPanel, passwdPanel, genderPanel, birthPanel, emailPanel, telPanel;
+	private JLabel nameLabel, idLabel, accountLabel, passwdLabel, genderLabel, birthLabel, emailLabel, telLabel;
+	private JTextField nameField, idField, accountField, emailField, telField;
 	private JComboBox<String> genderComboBox;
 	private JPasswordField passwdField;
 	private JButton submitButton, cancelButton;
 	private JDatePicker birthDatePicker; 
 	String gender[] = {"男", "女"};
+	private SQLInsert sqlInsert;
+	private String DB;
+	private String Account; // 取得輸入的帳號
+	private String Password; // 取得輸入的密碼
 
 	public Register() {
 		super("建立您的帳戶");
@@ -45,7 +53,7 @@ public class Register extends JFrame {
 
 		// body_Panel
 		bodyPanel = new JPanel();
-		bodyPanel.setLayout(new GridLayout(7,0));
+		bodyPanel.setLayout(new GridLayout(8,0));
 		bodyPanel.setBorder(BorderFactory.createEtchedBorder());
 		add(bodyPanel, BorderLayout.CENTER);
 		
@@ -58,6 +66,16 @@ public class Register extends JFrame {
 		nameField = new JTextField();
 		nameField.setColumns(10);
 		namePanel.add(nameField);
+		
+		// body_id
+		idPanel = new JPanel();
+		bodyPanel.add(idPanel);
+		idLabel = new JLabel("身分證字號");
+		idPanel.add(idLabel);
+		
+		idField = new JTextField();
+		idField.setColumns(10);
+		idPanel.add(idField);
 		
 		// body_account
 		accountPanel = new JPanel();
@@ -128,7 +146,13 @@ public class Register extends JFrame {
 		submitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				createAccount();
+				if (createAccount()) {
+					JOptionPane.showMessageDialog(null, "歡迎加入！");
+					dispose();
+				} else {
+					JOptionPane.showMessageDialog(null, "建立錯誤，請重新輸入");
+					initRegisterInput();
+				}
 			}
 		});
 		
@@ -138,18 +162,32 @@ public class Register extends JFrame {
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
+				dispose();
 			}
 		});
 		
+		DB = "MiddleProject";
+		Account = "root"; // 取得輸入的帳號
+		Password = ""; // 取得輸入的密碼
+		sqlInsert = new SQLInsert(DB, Account, Password);
 		
 		setSize(300, 400);
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 	
-	private void createAccount() {
+	private void initRegisterInput() {
+		nameField.setText("");
+		idField.setText("");
+		accountField.setText("");
+		passwdField.setText("");
+		emailField.setText("");
+		telField.setText("");
+	}
+	
+	private Boolean createAccount() {
 		String name = getUserName();
+		String idNumber = getIdNumber();
 		String account = getAccount();
 		String passwd = getPassword();
 		String gender = getGender();
@@ -157,11 +195,19 @@ public class Register extends JFrame {
 		String mail = getMail();
 		String tel = getTel();
 		
-//		insertDB(name, account, passwd, gender, birth, mail, tel);
+		if (sqlInsert.setCreateAccount(name, idNumber, account, passwd, gender, birth, mail, tel)) {
+			return true;
+		} else {
+			return false;
+		}	
 	}
 	
 	private String getUserName() {
 		return nameField.getText();
+	}
+	
+	private String getIdNumber() {
+		return idField.getText();
 	}
 	
 	private String getAccount() {
@@ -190,17 +236,6 @@ public class Register extends JFrame {
 	
 	private String getTel() {
 		return telField.getText();
-	}
-	
-	private void insertDB(String name, String account, String passwd, String gender, String birth, String mail, String tel) {
-		Properties prop = new Properties();
-		prop.put("user", "root");
-		prop.put("password", "");
-		String DB = "MiddleProject";
-		String userInfoSql = "insert into UserInfo (UserName, UserGender, UserBirth, UserEmail, UserTel)"
-				+ "values (?,?,?,?,?)";
-		String userAccountSql = "insert into Account (UserID, UserName, Account, Passwd)"
-				+ "values (?,?,?,?)";
 	}
 
 	public static void main(String[] args) {
