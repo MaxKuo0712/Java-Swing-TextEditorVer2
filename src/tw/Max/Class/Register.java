@@ -45,7 +45,9 @@ public class Register extends JFrame {
 
 	public Register() {
 		super("建立您的帳戶");
+		setSize(300, 400);
 		setLayout(new BorderLayout());
+		setLocationRelativeTo(null);
 		
 		// header_Panel
 		headerPanel = new JPanel();
@@ -171,9 +173,8 @@ public class Register extends JFrame {
 		Password = ""; // 取得輸入的密碼
 		sqlInsert = new SQLInsert(DB, Account, Password);
 		
-		setSize(300, 400);
 		setVisible(true);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 	
 	private void initRegisterInput() {
@@ -238,8 +239,8 @@ public class Register extends JFrame {
 		return telField.getText();
 	}
 
-	public static void main(String[] args) {
-		new Register();
-	}
+//	public static void main(String[] args) {
+//		new Register();
+//	}
 
 }

@@ -2,16 +2,22 @@ package tw.Max.Class;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.util.*;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class TabbedPane extends JTabbedPane {
 	private JTextPane textPane;
 	private HashMap<String, String> tabNameMap;
 	private LinkedList<JTextPane> tabList;
+	private ImageIcon tabIcon;
 	
 	// 建構式
 	public TabbedPane() {
@@ -52,8 +58,18 @@ public class TabbedPane extends JTabbedPane {
 			textPane.setName(sheetName); // 給予TextPane名字 以便後面使用
 			tabList.add(textPane); // 存下JTextPane
 			tabNameMap.put(sheetName, ""); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
-			addTab(sheetName, new JScrollPane(textPane)); // 新增頁籤
+
+			try {
+				BufferedImage imgURL = ImageIO.read(new File("img/xx.png"));
+				tabIcon = new ImageIcon(imgURL);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			addTab(sheetName, tabIcon, new JScrollPane(textPane)); // 新增頁籤
 		}
+		setSelectedIndex(getTabCount() - 1);  // 新增後, 選擇新增的tab
 	}
 	
 	// 載入頁籤時要新增頁籤及內容
@@ -102,7 +118,7 @@ public class TabbedPane extends JTabbedPane {
 	}
 	
 	// 取的TextArea的名字
-	private String getTextPaneName() {
+	public String getTextPaneName() {
 		return tabList.get(getSelectedIndex()).getName();
 	}
 	

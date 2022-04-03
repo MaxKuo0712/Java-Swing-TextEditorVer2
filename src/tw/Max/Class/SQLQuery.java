@@ -30,7 +30,7 @@ public class SQLQuery {
 		String User = this.User;
 		String Passwd = this.Passwd;
 		
-		String sql = "select account, passwd from account where account = ?";
+		String sql = "select * from account where account = ?";
 
 		try(Connection conn = DriverManager.getConnection(DB, User, Passwd)) {
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -40,6 +40,14 @@ public class SQLQuery {
 			if(result.next()) {
 				String hashpasswd = result.getString("Passwd");
 				if (BCrypt.checkpw(Password, hashpasswd)) {
+//					String userName = result.getString("Passwd");
+//					String userIdNumber = result.getString("Passwd");
+//					String userAccount = result.getString("Passwd");
+//					String userGender = result.getString("Passwd");
+//					String userBirth = result.getString("Passwd");
+//					String userMail = result.getString("Passwd");
+//					String userTel = result.getString("Passwd");
+					
 					return 1; // 登入成功
 				} else {
 					return 2; // 密碼錯誤
