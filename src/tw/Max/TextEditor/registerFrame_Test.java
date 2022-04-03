@@ -17,7 +17,6 @@ public class registerFrame_Test extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField textField;
-	private JTextField textField_1;
 	private JTextField textField_5;
 	private JTextField textField_3;
 	private JPasswordField passwordField;
@@ -108,16 +107,6 @@ public class registerFrame_Test extends JFrame {
 		
 		JComboBox comboBox = new JComboBox();
 		panel_7.add(comboBox);
-		
-		JPanel panel_8 = new JPanel();
-		panel_3.add(panel_8);
-		
-		JLabel lblNewLabel_5 = new JLabel("年齡");
-		panel_8.add(lblNewLabel_5);
-		
-		textField_1 = new JTextField();
-		panel_8.add(textField_1);
-		textField_1.setColumns(10);
 		
 		JPanel panel_9 = new JPanel();
 		panel_3.add(panel_9);

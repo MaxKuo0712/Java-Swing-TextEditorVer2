@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -67,7 +66,7 @@ public class Login extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (checkLogin()) {
 					new TextEditor(); // 開啟主要程式
-					dispose(); // 登入成功進入主要程式後關閉
+					System.exit(0); // 登入成功進入主要程式後關閉
 				}
 			}
 		});
