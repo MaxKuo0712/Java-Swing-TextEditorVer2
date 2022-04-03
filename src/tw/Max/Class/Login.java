@@ -32,6 +32,7 @@ public class Login extends JFrame {
 		setSize(190,150);
 		setResizable(false); // 視窗不能拉伸大小
 		setLayout(new BorderLayout());
+		setLocationRelativeTo(null);
 		
 		// body
 		body = new JPanel();
@@ -64,7 +65,7 @@ public class Login extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (checkLogin()) {
-					new TextEditor(); // 開啟主要程式
+					new TextEditor(getUserAccount()); // 開啟主要程式
 					dispose(); // 登入成功進入主要程式後關閉
 				}
 			}
@@ -111,7 +112,7 @@ public class Login extends JFrame {
 		}
 	}
 	
-	private String getUserAccount() {
+	public String getUserAccount() {
 		return userAccount.getText();
 	}
 	

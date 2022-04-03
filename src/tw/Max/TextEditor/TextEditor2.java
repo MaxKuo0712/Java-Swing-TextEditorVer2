@@ -10,41 +10,24 @@ import java.awt.event.WindowListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicOptionPaneUI.ButtonActionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 
-import tw.Max.Class.FileTree;
 import tw.Max.Class.Login;
 import tw.Max.Class.TabbedPane;
 
-public class TextEditor extends JFrame {
+public class TextEditor2 extends JFrame {
 	private JMenuBar menuBar;
-	private JMenu fileMenu;
-	private JMenuItem addSheet, save, newSave, load, delSheet;
+	private JButton addSheet, save, newSave, load, delSheet;
 	private JComboBox<String> colorComboBox, fontComboBox, sizeComboBox;
 	private JPanel topPanel, mainPanel, textPanel;
 	private TabbedPane tabbedPane;
-	public FileTree tree;
-	public TreeModel model;
-	public DefaultMutableTreeNode root;
-	private String UserAccount;
 	
-	public TextEditor(String UserAccount) {
+	public TextEditor2() {
 		// 定義視窗
 		super("Text Editor");
-		setSize(640, 480);
 		setLayout(new BorderLayout());
-		setLocationRelativeTo(null);
-		
-		// setUserAccount
-		setUserAccount(UserAccount);
 		
 		// 選單列
 		menuBar = new JMenuBar();
@@ -102,45 +85,31 @@ public class TextEditor extends JFrame {
 		tabbedPane = new TabbedPane();
 		textPanel.add(tabbedPane, BorderLayout.CENTER);
 		
-		// MenuItem
-		fileMenu = new JMenu("檔案");
-		menuBar.add(fileMenu);
-		
 		// 新增頁籤
-		addSheet = new JMenuItem("新增文件");
-		fileMenu.add(addSheet);
+		addSheet = new JButton("New");
+		menuBar.add(addSheet);
 		
 		// 刪除頁籤
-		delSheet = new JMenuItem("刪除檔案");
-		fileMenu.add(delSheet);
+		delSheet = new JButton("Delete");
+		menuBar.add(delSheet);
 
 		// 儲存
-		save = new JMenuItem("儲存檔案");
-		fileMenu.add(save);
+		save = new JButton("Save");
+		menuBar.add(save);
 		
 		// 另存新檔
-		newSave = new JMenuItem("另存新檔");
-		fileMenu.add(newSave);
+		newSave = new JButton("Save As");
+		menuBar.add(newSave);
 		
 		// 開啟舊檔
-		load = new JMenuItem("開啟舊檔");
-		fileMenu.add(load);
+		load = new JButton("Load");
+		menuBar.add(load);
 		
-		// Tree
-//		root = new DefaultMutableTreeNode(UserAccount);
-//		model = new DefaultTreeModel(root);
-		tree = new FileTree(this.UserAccount);
-		add(tree, BorderLayout.WEST);
-		
-		// Listener
-		setListener();
-		
+		setSize(640, 480);
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-	}
-	
-	private void setUserAccount(String UserAccount) {
-		this.UserAccount = UserAccount;
+		
+		setListener();
 	}
 	
 	private void setListener() {
@@ -236,7 +205,6 @@ public class TextEditor extends JFrame {
 	// 新增頁籤
 	private void addSheet() {
 		tabbedPane.addNewTabs();
-		tree.addFileTreeNode(tabbedPane.getTextPaneName());
 	}
 	
 	// 刪除頁籤
@@ -260,7 +228,7 @@ public class TextEditor extends JFrame {
 	}
 	
 	// 程式進入點
-//	public static void main(String[] args) {
-//		new TextEditor();
-//	}
+	public static void main(String[] args) {
+		new TextEditor2();
+	}
 }
