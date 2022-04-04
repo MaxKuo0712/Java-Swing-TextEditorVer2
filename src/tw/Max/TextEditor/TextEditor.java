@@ -219,7 +219,6 @@ public class TextEditor extends JFrame {
 					refreshMenuItem.addActionListener(new ActionListener(){
 						@Override 
 						public void actionPerformed(ActionEvent actionEvent) { 
-							System.out.println("刪除檔案");
 							removeTreeNode();
 						} 
 				    }); 
@@ -279,12 +278,14 @@ public class TextEditor extends JFrame {
 		tabbedPane.load();
 	}
 	
+	// Remove Tree Node
 	private void removeTreeNode() {
 		DefaultMutableTreeNode path = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getParent();
-		int selectedIndex = parent.getIndex(path);
-		
-		tree.removeFileTreeNode(selectedIndex);
+		if (parent != null) {
+			int selectedIndex = parent.getIndex(path);
+			tree.removeFileTreeNode(selectedIndex);
+		}
 	}
 	
 	// 程式進入點
