@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -14,11 +16,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicOptionPaneUI.ButtonActionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import tw.Max.Class.FileTree;
 import tw.Max.Class.Login;
@@ -27,13 +31,11 @@ import tw.Max.Class.TabbedPane;
 public class TextEditor extends JFrame {
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
-	private JMenuItem addSheet, save, newSave, load, delSheet;
+	private JMenuItem addSheet, save, export, load, delSheet;
 	private JComboBox<String> colorComboBox, fontComboBox, sizeComboBox;
 	private JPanel topPanel, mainPanel, textPanel;
 	private TabbedPane tabbedPane;
 	public FileTree tree;
-	public TreeModel model;
-	public DefaultMutableTreeNode root;
 	private String UserAccount;
 	
 	public TextEditor(String UserAccount) {
@@ -110,25 +112,19 @@ public class TextEditor extends JFrame {
 		addSheet = new JMenuItem("新增文件");
 		fileMenu.add(addSheet);
 		
-		// 刪除頁籤
-		delSheet = new JMenuItem("刪除檔案");
-		fileMenu.add(delSheet);
-
 		// 儲存
 		save = new JMenuItem("儲存檔案");
 		fileMenu.add(save);
 		
-		// 另存新檔
-		newSave = new JMenuItem("另存新檔");
-		fileMenu.add(newSave);
+		// 匯出檔案
+		export = new JMenuItem("匯出檔案");
+		fileMenu.add(export);
 		
-		// 開啟舊檔
-		load = new JMenuItem("開啟舊檔");
+		// 開啟檔案
+		load = new JMenuItem("開啟檔案");
 		fileMenu.add(load);
 		
 		// Tree
-//		root = new DefaultMutableTreeNode(UserAccount);
-//		model = new DefaultTreeModel(root);
 		tree = new FileTree(this.UserAccount);
 		add(tree, BorderLayout.WEST);
 		
@@ -175,15 +171,7 @@ public class TextEditor extends JFrame {
 				addSheet();
 			}
 		});
-		
-		// 刪除頁籤
-		delSheet.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				delSheet();
-			}
-		});
-		
+
 		// 存檔
 		save.addActionListener(new ActionListener() {
 			@Override
@@ -195,24 +183,58 @@ public class TextEditor extends JFrame {
 			}
 		});
 	
-		// 另存新檔
-		newSave.addActionListener(new ActionListener() {
+		// 匯出檔案
+		export.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// 沒有頁籤的時候，不能執行儲存
 				if(tabbedPane.getTabSize() > 0) {
-					newSave();
+					exportFile();
 				}
 			}
 		});
 		
-		// 讀取
+		// 開啟檔案
 		load.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				load();
 			}
 		});
+		
+		// Remove Tree Node
+		tree.addMouseListener(new MouseAdapter() {
+			private void myPopupEvent(MouseEvent e) { 
+				JTree tree = (JTree)e.getSource(); 
+				TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+				if (path == null) return; 
+				
+				tree.setSelectionPath(path);	
+				DefaultMutableTreeNode rightClickedNode = (DefaultMutableTreeNode)path.getLastPathComponent(); 
+				
+				if (rightClickedNode.isLeaf()) {
+					JPopupMenu popup = new JPopupMenu();
+					final JMenuItem refreshMenuItem = new JMenuItem("刪除檔案"); 
+					
+					refreshMenuItem.addActionListener(new ActionListener(){
+						@Override 
+						public void actionPerformed(ActionEvent actionEvent) { 
+							removeTreeNode();
+						} 
+				    }); 
+					
+				    popup.add(refreshMenuItem); 
+				    popup.show(tree, e.getX(), e.getY()); 
+			    } 
+			} 
+			
+			public void mousePressed(MouseEvent e) { 
+				if (e.isPopupTrigger()) myPopupEvent(e); 
+			} 
+		});
+		
+		
+		
 	}
 	
 	// 設定字體
@@ -235,28 +257,35 @@ public class TextEditor extends JFrame {
 	
 	// 新增頁籤
 	private void addSheet() {
-		tabbedPane.addNewTabs();
-		tree.addFileTreeNode(tabbedPane.getTextPaneName());
+		// 如果頁籤新增成功才新增tree node
+		if (tabbedPane.addNewTabs()) {
+			tree.addFileTreeNode(tabbedPane.getTextPaneName());
+		}
 	}
-	
-	// 刪除頁籤
-	private void delSheet() {
-		tabbedPane.delSheet();
-	}
-	
+
 	// 儲存
 	private void save() {
 		tabbedPane.saveTextPane();
 	}
 	
-	// 另存新檔
-	private void newSave() {
-		tabbedPane.newSave();
+	// 匯出檔案
+	private void exportFile() {
+		tabbedPane.exportFile();
 	}
 
-	// 讀取
+	// 開啟檔案
 	private void load() {
 		tabbedPane.load();
+	}
+	
+	// Remove Tree Node
+	private void removeTreeNode() {
+		DefaultMutableTreeNode path = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getParent();
+		if (parent != null) {
+			int selectedIndex = parent.getIndex(path);
+			tree.removeFileTreeNode(selectedIndex);
+		}
 	}
 	
 	// 程式進入點
@@ -264,3 +293,5 @@ public class TextEditor extends JFrame {
 //		new TextEditor();
 //	}
 }
+
+
