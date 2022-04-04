@@ -227,8 +227,14 @@ public class Register extends JFrame {
 	
 	private String getBirth() {
 		SimpleDateFormat f1 = new SimpleDateFormat("yyyy-MM-dd");
-		Date targetDate = (Date) birthDatePicker.getModel().getValue();
-		return f1.format(targetDate);
+		LocalDate targetDate = (LocalDate) birthDatePicker.getModel().getValue();
+		
+		if (targetDate.isBefore(LocalDate.now())) {
+			return f1.format(targetDate);
+		} else {
+			JOptionPane.showMessageDialog(null, "請輸入正確出生日期");
+			return null;
+		}
 	}
 	
 	private String getMail() {

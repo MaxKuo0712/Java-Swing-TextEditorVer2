@@ -27,7 +27,7 @@ import tw.Max.Class.TabbedPane;
 public class TextEditor extends JFrame {
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
-	private JMenuItem addSheet, save, newSave, load, delSheet;
+	private JMenuItem addSheet, save, export, load, delSheet;
 	private JComboBox<String> colorComboBox, fontComboBox, sizeComboBox;
 	private JPanel topPanel, mainPanel, textPanel;
 	private TabbedPane tabbedPane;
@@ -111,19 +111,19 @@ public class TextEditor extends JFrame {
 		fileMenu.add(addSheet);
 		
 		// 刪除頁籤
-		delSheet = new JMenuItem("刪除檔案");
-		fileMenu.add(delSheet);
+//		delSheet = new JMenuItem("刪除檔案");
+//		fileMenu.add(delSheet);
 
 		// 儲存
 		save = new JMenuItem("儲存檔案");
 		fileMenu.add(save);
 		
-		// 另存新檔
-		newSave = new JMenuItem("另存新檔");
-		fileMenu.add(newSave);
+		// 匯出檔案
+		export = new JMenuItem("匯出檔案");
+		fileMenu.add(export);
 		
-		// 開啟舊檔
-		load = new JMenuItem("開啟舊檔");
+		// 開啟檔案
+		load = new JMenuItem("開啟檔案");
 		fileMenu.add(load);
 		
 		// Tree
@@ -177,12 +177,12 @@ public class TextEditor extends JFrame {
 		});
 		
 		// 刪除頁籤
-		delSheet.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				delSheet();
-			}
-		});
+//		delSheet.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				delSheet();
+//			}
+//		});
 		
 		// 存檔
 		save.addActionListener(new ActionListener() {
@@ -195,18 +195,18 @@ public class TextEditor extends JFrame {
 			}
 		});
 	
-		// 另存新檔
-		newSave.addActionListener(new ActionListener() {
+		// 匯出檔案
+		export.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// 沒有頁籤的時候，不能執行儲存
 				if(tabbedPane.getTabSize() > 0) {
-					newSave();
+					exportFile();
 				}
 			}
 		});
 		
-		// 讀取
+		// 開啟檔案
 		load.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -240,21 +240,21 @@ public class TextEditor extends JFrame {
 	}
 	
 	// 刪除頁籤
-	private void delSheet() {
-		tabbedPane.delSheet();
-	}
+//	private void delSheet() {
+//		tabbedPane.delSheet();
+//	}
 	
 	// 儲存
 	private void save() {
 		tabbedPane.saveTextPane();
 	}
 	
-	// 另存新檔
-	private void newSave() {
-		tabbedPane.newSave();
+	// 匯出檔案
+	private void exportFile() {
+		tabbedPane.exportFile();
 	}
 
-	// 讀取
+	// 開啟檔案
 	private void load() {
 		tabbedPane.load();
 	}

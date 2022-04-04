@@ -146,12 +146,12 @@ public class TextEditor2 extends JFrame {
 		});
 		
 		// 刪除頁籤
-		delSheet.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				delSheet();
-			}
-		});
+//		delSheet.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				delSheet();
+//			}
+//		});
 		
 		// 存檔
 		save.addActionListener(new ActionListener() {
@@ -208,9 +208,9 @@ public class TextEditor2 extends JFrame {
 	}
 	
 	// 刪除頁籤
-	private void delSheet() {
-		tabbedPane.delSheet();
-	}
+//	private void delSheet() {
+//		tabbedPane.delSheet();
+//	}
 	
 	// 儲存
 	private void save() {
@@ -219,7 +219,7 @@ public class TextEditor2 extends JFrame {
 	
 	// 另存新檔
 	private void newSave() {
-		tabbedPane.newSave();
+		tabbedPane.exportFile();
 	}
 
 	// 讀取

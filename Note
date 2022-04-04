@@ -38,7 +38,7 @@ create table Account (
 )
 
 ALTER TABLE Account 
-ADD FOREIGN KEY (UserID) REFERENCES userinfo(UserID)
+ADD FOREIGN KEY (UserIdNumber) REFERENCES userinfo(UserIdNumber)
 
 ALTER TABLE Account 
 ADD FOREIGN KEY (UserName) REFERENCES userinfo(UserName)
@@ -51,9 +51,16 @@ select u.UserID, u.UserName, 'maxkuo712', 'as13456'
 from userinfo as u
 where UserName = '郭哲嘉'
 
+maxkuo712@gmail.com
 
-
-
+-- 文字內容--
+create table Content (
+	Account varchar(100) UNIQUE not null,
+	UserIdNumber varchar(50) UNIQUE not null PRIMARY KEY,
+	CreateTime datetime default sysdate(),
+	ReviseTime datetime default null,
+	ReviseName varchar(100) default null
+)
 
 
 

@@ -13,46 +13,31 @@ import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-public class TabbedPane extends JTabbedPane implements MouseListener{
+public class TabbedPane2 extends JTabbedPane {
 	private JTextPane textPane;
 	private HashMap<String, String> tabNameMap;
 	private LinkedList<JTextPane> tabList;
 	private ImageIcon tabIcon;
 	
 	// 建構式
-	public TabbedPane() {
+	public TabbedPane2() {
 		tabNameMap = new HashMap<>(); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
 		tabList = new LinkedList<>(); // 存下JTextPane
-		addMouseListener(this);
 		
 		// 視窗頁籤
 		setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 	}
 	
-	public void mouseClicked(MouseEvent e) {
-	    int tabNumber = getUI().tabForCoordinate(this, e.getX(), e.getY());
-	    if (tabNumber < 0) return;
-	    
+	// 刪除頁籤
+	public void delSheet() {
 		// 當有頁籤存在及User同意刪除才會執行
 		if (getTabCount() > 0 && isDeleteSheet() == true) {
-		    Rectangle rect=((CloseTabIcon)getIconAt(tabNumber)).getBounds();
-		    if (rect.contains(e.getX(), e.getY())) {
-		      this.removeTabAt(tabNumber); // 關閉頁籤
-		    }
+			tabNameMap.remove(getTextPaneName());
+			tabList.remove(getSelectedIndex());
+			remove(getSelectedIndex());
 		}
-    }
-
-	
-	// 刪除頁籤
-//	public void delSheet() {
-//		// 當有頁籤存在及User同意刪除才會執行
-//		if (getTabCount() > 0 && isDeleteSheet() == true) {
-//			tabNameMap.remove(getTextPaneName());
-//			tabList.remove(getSelectedIndex());
-//			remove(getSelectedIndex());
-//		}
-//	}
+	}
 	
 	// 詢問User是否真的要刪除
 	private boolean isDeleteSheet() {
@@ -74,15 +59,15 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 			tabList.add(textPane); // 存下JTextPane
 			tabNameMap.put(sheetName, ""); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
 
-//			try {
-//				BufferedImage imgURL = ImageIO.read(new File("img/xx.png"));
-//				tabIcon = new ImageIcon(imgURL);
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+			try {
+				BufferedImage imgURL = ImageIO.read(new File("img/xx.png"));
+				tabIcon = new ImageIcon(imgURL);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
-			addTab(sheetName, new CloseTabIcon(null), new JScrollPane(textPane)); // 新增頁籤
+			addTab(sheetName, tabIcon, new JScrollPane(textPane)); // 新增頁籤
 		}
 		setSelectedIndex(getTabCount() - 1);  // 新增後, 選擇新增的tab
 	}
@@ -157,15 +142,15 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 		return tabNameMap.get(outputName);
 	}
 	
-	// 匯出檔案
-	public void exportFile() {
+	// 另存新檔
+	public void newSave() {
 		String outputName = getTextPaneName(); // 取得頁籤名稱
 		String outputText = getTextPaneText(); // 取得頁籤內容
 		byte[] outputByte = outputText.getBytes(); // 字串轉為byte
 
 		//彈出檔案選擇框
 		JFileChooser chooser = new JFileChooser();
-		chooser.setDialogTitle("匯出檔案");
+		chooser.setDialogTitle("另存新檔");
 		chooser.setSelectedFile(new File(outputName)); // 預設檔名是頁籤名稱
 
 		if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {	//假如使用者選擇了儲存
@@ -177,7 +162,7 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 				fos.write(outputByte); // 序列化 寫入
 				fos.flush();
 				fos.close();
-				JOptionPane.showMessageDialog(null, "匯出成功");
+				JOptionPane.showMessageDialog(null, "儲存成功");
 			} catch (Exception e) {
 				System.err.println(e.toString()); // 印出出錯訊息
 				e.printStackTrace(); // 印出出錯位置
@@ -194,7 +179,7 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 		
 		// 如果沒有儲存過，就沒有路徑，那就去找newSave另存新檔
 		if (fileRoute == "") {
-			exportFile();
+			newSave();
 		} else {
 			try {
 				FileOutputStream fos = new FileOutputStream(fileRoute.concat(".txt")); // 串流 - 設定存文字檔
@@ -209,7 +194,7 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 		}
 	}
 
-	// 開啟檔案
+	// 讀取檔案
 	public void load() {
 		//彈出檔案選擇框
 		JFileChooser chooser = new JFileChooser();
@@ -281,79 +266,5 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 			}
 		}
 	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 }
-
-class CloseTabIcon implements Icon {
-	  private int x_pos;
-	  private int y_pos;
-	  private int width;
-	  private int height;
-	  private Icon fileIcon;
-
-	  public CloseTabIcon(Icon fileIcon) {
-	    this.fileIcon=fileIcon;
-	    width=16;
-	    height=16;
-	  }
-
-	  public void paintIcon(Component c, Graphics g, int x, int y) {
-	    this.x_pos=x;
-	    this.y_pos=y;
-
-	    Color col=g.getColor();
-
-	    g.setColor(Color.black);
-	    int y_p=y+2;
-	    g.drawLine(x+1, y_p, x+12, y_p);
-	    g.drawLine(x+1, y_p+13, x+12, y_p+13);
-	    g.drawLine(x, y_p+1, x, y_p+12);
-	    g.drawLine(x+13, y_p+1, x+13, y_p+12);
-	    g.drawLine(x+3, y_p+3, x+10, y_p+10);
-	    g.drawLine(x+3, y_p+4, x+9, y_p+10);
-	    g.drawLine(x+4, y_p+3, x+10, y_p+9);
-	    g.drawLine(x+10, y_p+3, x+3, y_p+10);
-	    g.drawLine(x+10, y_p+4, x+4, y_p+10);
-	    g.drawLine(x+9, y_p+3, x+3, y_p+9);
-	    g.setColor(col);
-	    if (fileIcon != null) {
-	      fileIcon.paintIcon(c, g, x+width, y_p);
-	    }
-	  }
-
-	  public int getIconWidth() {
-	    return width + (fileIcon != null? fileIcon.getIconWidth() : 0);
-	  }
-
-	  public int getIconHeight() {
-	    return height;
-	  }
-
-	  public Rectangle getBounds() {
-	    return new Rectangle(x_pos, y_pos, width, height);
-	  }
-	}
