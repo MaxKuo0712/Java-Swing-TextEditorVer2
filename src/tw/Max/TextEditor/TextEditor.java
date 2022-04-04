@@ -110,10 +110,6 @@ public class TextEditor extends JFrame {
 		addSheet = new JMenuItem("新增文件");
 		fileMenu.add(addSheet);
 		
-		// 刪除頁籤
-//		delSheet = new JMenuItem("刪除檔案");
-//		fileMenu.add(delSheet);
-
 		// 儲存
 		save = new JMenuItem("儲存檔案");
 		fileMenu.add(save);
@@ -127,8 +123,6 @@ public class TextEditor extends JFrame {
 		fileMenu.add(load);
 		
 		// Tree
-//		root = new DefaultMutableTreeNode(UserAccount);
-//		model = new DefaultTreeModel(root);
 		tree = new FileTree(this.UserAccount);
 		add(tree, BorderLayout.WEST);
 		
@@ -175,15 +169,7 @@ public class TextEditor extends JFrame {
 				addSheet();
 			}
 		});
-		
-		// 刪除頁籤
-//		delSheet.addActionListener(new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				delSheet();
-//			}
-//		});
-		
+
 		// 存檔
 		save.addActionListener(new ActionListener() {
 			@Override
@@ -238,12 +224,7 @@ public class TextEditor extends JFrame {
 		tabbedPane.addNewTabs();
 		tree.addFileTreeNode(tabbedPane.getTextPaneName());
 	}
-	
-	// 刪除頁籤
-//	private void delSheet() {
-//		tabbedPane.delSheet();
-//	}
-	
+
 	// 儲存
 	private void save() {
 		tabbedPane.saveTextPane();

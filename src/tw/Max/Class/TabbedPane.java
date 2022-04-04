@@ -2,15 +2,10 @@ package tw.Max.Class;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
 import java.util.*;
-
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class TabbedPane extends JTabbedPane implements MouseListener{
@@ -42,17 +37,6 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 		    }
 		}
     }
-
-	
-	// 刪除頁籤
-//	public void delSheet() {
-//		// 當有頁籤存在及User同意刪除才會執行
-//		if (getTabCount() > 0 && isDeleteSheet() == true) {
-//			tabNameMap.remove(getTextPaneName());
-//			tabList.remove(getSelectedIndex());
-//			remove(getSelectedIndex());
-//		}
-//	}
 	
 	// 詢問User是否真的要刪除
 	private boolean isDeleteSheet() {
@@ -73,15 +57,6 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 			textPane.setName(sheetName); // 給予TextPane名字 以便後面使用
 			tabList.add(textPane); // 存下JTextPane
 			tabNameMap.put(sheetName, ""); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
-
-//			try {
-//				BufferedImage imgURL = ImageIO.read(new File("img/xx.png"));
-//				tabIcon = new ImageIcon(imgURL);
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-			
 			addTab(sheetName, new CloseTabIcon(null), new JScrollPane(textPane)); // 新增頁籤
 		}
 		setSelectedIndex(getTabCount() - 1);  // 新增後, 選擇新增的tab
