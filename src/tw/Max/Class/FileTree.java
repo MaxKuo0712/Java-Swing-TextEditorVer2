@@ -6,7 +6,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 
 public class FileTree extends JTree {
-	private DefaultMutableTreeNode root;
+	public DefaultMutableTreeNode root;
 	private TreeModel model;
 	
 	public FileTree(String UserAccount) {
@@ -18,5 +18,11 @@ public class FileTree extends JTree {
 	public void addFileTreeNode(String tabName) {
 		root.add(new DefaultMutableTreeNode(tabName));
 		setModel(new DefaultTreeModel(root));
+	}
+	
+	public void removeFileTreeNode(int index) {
+		root.remove(index);
+		model = new DefaultTreeModel(root);
+		setModel(model);
 	}
 }

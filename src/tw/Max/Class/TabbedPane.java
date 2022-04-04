@@ -12,7 +12,6 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 	private JTextPane textPane;
 	private HashMap<String, String> tabNameMap;
 	private LinkedList<JTextPane> tabList;
-	private ImageIcon tabIcon;
 	
 	// 建構式
 	public TabbedPane() {
@@ -26,21 +25,21 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 	}
 	
 	public void mouseClicked(MouseEvent e) {
-	    int tabNumber = getUI().tabForCoordinate(this, e.getX(), e.getY());
-	    if (tabNumber < 0) return;
-	    
+		int removeTabIndex = getUI().tabForCoordinate(this, e.getX(), e.getY());
+	    if (removeTabIndex < 0) return;
+
 		// 當有頁籤存在及User同意刪除才會執行
 		if (getTabCount() > 0 && isDeleteSheet() == true) {
-		    Rectangle rect=((CloseTabIcon)getIconAt(tabNumber)).getBounds();
+		    Rectangle rect=((CloseTabIcon)getIconAt(removeTabIndex)).getBounds();
 		    if (rect.contains(e.getX(), e.getY())) {
-		      this.removeTabAt(tabNumber); // 關閉頁籤
+		      this.removeTabAt(removeTabIndex); // 關閉頁籤
 		    }
 		}
     }
 	
 	// 詢問User是否真的要刪除
 	private boolean isDeleteSheet() {
-		int isAgain = JOptionPane.showConfirmDialog(null, "確定要刪除該頁籤？", "刪除頁籤", JOptionPane.YES_NO_OPTION);
+		int isAgain = JOptionPane.showConfirmDialog(null, "確定要	關閉該頁籤？", "關閉頁籤", JOptionPane.YES_NO_OPTION);
 		if (isAgain == 0) {
 			return true;
 		} else {

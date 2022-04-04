@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -14,11 +16,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicOptionPaneUI.ButtonActionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import tw.Max.Class.FileTree;
 import tw.Max.Class.Login;
@@ -32,8 +36,6 @@ public class TextEditor extends JFrame {
 	private JPanel topPanel, mainPanel, textPanel;
 	private TabbedPane tabbedPane;
 	public FileTree tree;
-	public TreeModel model;
-	public DefaultMutableTreeNode root;
 	private String UserAccount;
 	
 	public TextEditor(String UserAccount) {
@@ -199,6 +201,41 @@ public class TextEditor extends JFrame {
 				load();
 			}
 		});
+		
+		// Remove Tree Node
+		tree.addMouseListener(new MouseAdapter() {
+			private void myPopupEvent(MouseEvent e) { 
+				JTree tree = (JTree)e.getSource(); 
+				TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+				if (path == null) return; 
+				
+				tree.setSelectionPath(path);	
+				DefaultMutableTreeNode rightClickedNode = (DefaultMutableTreeNode)path.getLastPathComponent(); 
+				
+				if (rightClickedNode.isLeaf()) {
+					JPopupMenu popup = new JPopupMenu();
+					final JMenuItem refreshMenuItem = new JMenuItem("刪除檔案"); 
+					
+					refreshMenuItem.addActionListener(new ActionListener(){
+						@Override 
+						public void actionPerformed(ActionEvent actionEvent) { 
+							System.out.println("刪除檔案");
+							removeTreeNode();
+						} 
+				    }); 
+					
+				    popup.add(refreshMenuItem); 
+				    popup.show(tree, e.getX(), e.getY()); 
+			    } 
+			} 
+			
+			public void mousePressed(MouseEvent e) { 
+				if (e.isPopupTrigger()) myPopupEvent(e); 
+			} 
+		});
+		
+		
+		
 	}
 	
 	// 設定字體
@@ -242,8 +279,18 @@ public class TextEditor extends JFrame {
 		tabbedPane.load();
 	}
 	
+	private void removeTreeNode() {
+		DefaultMutableTreeNode path = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getParent();
+		int selectedIndex = parent.getIndex(path);
+		
+		tree.removeFileTreeNode(selectedIndex);
+	}
+	
 	// 程式進入點
 //	public static void main(String[] args) {
 //		new TextEditor();
 //	}
 }
+
+
