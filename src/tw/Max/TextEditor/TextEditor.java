@@ -221,8 +221,10 @@ public class TextEditor extends JFrame {
 	
 	// 新增頁籤
 	private void addSheet() {
-		tabbedPane.addNewTabs();
-		tree.addFileTreeNode(tabbedPane.getTextPaneName());
+		// 如果頁籤新增成功才新增tree node
+		if (tabbedPane.addNewTabs()) {
+			tree.addFileTreeNode(tabbedPane.getTextPaneName());
+		}
 	}
 
 	// 儲存

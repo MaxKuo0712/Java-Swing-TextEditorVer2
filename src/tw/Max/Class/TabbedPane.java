@@ -49,7 +49,7 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 	}
 	
 	// 新增頁籤
-	public void addNewTabs() {
+	public Boolean addNewTabs() {
 		String sheetName = JOptionPane.showInputDialog("請輸入檔案名稱：");
 		sheetName = setTabName(sheetName); // 先檢查要新增的檔案名稱
 		if (!(sheetName == null)) {
@@ -58,8 +58,11 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 			tabList.add(textPane); // 存下JTextPane
 			tabNameMap.put(sheetName, ""); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
 			addTab(sheetName, new CloseTabIcon(null), new JScrollPane(textPane)); // 新增頁籤
-		}
-		setSelectedIndex(getTabCount() - 1);  // 新增後, 選擇新增的tab
+			setSelectedIndex(getTabCount() - 1);  // 新增後, 選擇新增的tab
+			return true;
+		} else {
+			return false;
+		}	
 	}
 	
 	// 載入頁籤時要新增頁籤及內容
