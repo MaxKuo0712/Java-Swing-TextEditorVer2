@@ -31,7 +31,7 @@ import tw.Max.Class.TabbedPane;
 public class TextEditor extends JFrame {
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
-	private JMenuItem addSheet, save, export, load, delSheet;
+	private JMenuItem addSheet, save, export, load;
 	private JComboBox<String> colorComboBox, fontComboBox, sizeComboBox;
 	private JPanel topPanel, mainPanel, textPanel;
 	private TabbedPane tabbedPane;
@@ -101,7 +101,7 @@ public class TextEditor extends JFrame {
 		mainPanel.add(textPanel, BorderLayout.CENTER);
 		
 		// 視窗頁籤
-		tabbedPane = new TabbedPane();
+		tabbedPane = new TabbedPane(this.UserAccount);
 		textPanel.add(tabbedPane, BorderLayout.CENTER);
 		
 		// MenuItem
@@ -232,9 +232,6 @@ public class TextEditor extends JFrame {
 				if (e.isPopupTrigger()) myPopupEvent(e); 
 			} 
 		});
-		
-		
-		
 	}
 	
 	// 設定字體
@@ -265,7 +262,8 @@ public class TextEditor extends JFrame {
 
 	// 儲存
 	private void save() {
-		tabbedPane.saveTextPane();
+//		tabbedPane.saveTextPane();
+		tabbedPane.saveTabs(this.UserAccount);
 	}
 	
 	// 匯出檔案

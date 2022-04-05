@@ -10,14 +10,28 @@ import javax.swing.*;
 
 public class TabbedPane extends JTabbedPane implements MouseListener{
 	private JTextPane textPane;
+	private String UserAccount;
+	private SQLQuery sqlQuery;
+	private SQLInsert sqlinsert;
+	private String DB;
+	private String Account; // 取得輸入的帳號
+	private String Password; // 取得輸入的密碼
 	private HashMap<String, String> tabNameMap;
 	private LinkedList<JTextPane> tabList;
 	
 	// 建構式
-	public TabbedPane() {
+	public TabbedPane(String UserAccount) {
+		// setUserAccount
+		setUserAccount(UserAccount);
 		tabNameMap = new HashMap<>(); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
 		tabList = new LinkedList<>(); // 存下JTextPane
 		addMouseListener(this);
+		
+		DB = "MiddleProject";
+		Account = "root"; // 取得輸入的帳號
+		Password = ""; // 取得輸入的密碼
+		sqlQuery = new SQLQuery(DB, Account, Password);
+		sqlinsert = new SQLInsert(DB, Account, Password);
 		
 		// 視窗頁籤
 		setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -27,8 +41,8 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 	public void mouseClicked(MouseEvent e) {
 		int removeTabIndex = getUI().tabForCoordinate(this, e.getX(), e.getY());
 	    if (removeTabIndex < 0) return;
-
-		// 當有頁籤存在及User同意刪除才會執行
+//	    isSaveDB();
+		// 當有頁籤存在及User同意關閉才會執行
 		if (getTabCount() > 0 && isDeleteSheet() == true) {
 		    Rectangle rect=((CloseTabIcon)getIconAt(removeTabIndex)).getBounds();
 		    if (rect.contains(e.getX(), e.getY())) {
@@ -37,14 +51,31 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 		}
     }
 	
-	// 詢問User是否真的要刪除
-	private boolean isDeleteSheet() {
-		int isAgain = JOptionPane.showConfirmDialog(null, "確定要	關閉該頁籤？", "關閉頁籤", JOptionPane.YES_NO_OPTION);
-		if (isAgain == 0) {
+	// 關閉前檢查是否已經儲存
+	private Boolean isSaveDB() {
+		String TabName = getTextPaneName();
+		String UserAccount = this.UserAccount;
+		Boolean checkSaveResult = sqlQuery.getSqlTabsExistResult(UserAccount, TabName);
+		
+		if (checkSaveResult) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+	
+	// 詢問User是否真的要關閉
+	private boolean isDeleteSheet() {
+		int isClose = JOptionPane.showConfirmDialog(null, "確定要	關閉該頁籤？", "關閉頁籤", JOptionPane.YES_NO_OPTION);
+		if (isClose == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	private void setUserAccount(String UserAccount) {
+		this.UserAccount = UserAccount;
 	}
 	
 	// 新增頁籤
@@ -162,29 +193,43 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 		}
 	}
 	
-	// 儲存檔案
-	public void saveTextPane() {
-		String outputName = getTextPaneName(); // 取得頁籤名稱
-		String outputText = getTextPaneText(); // 取得頁籤內容
-		String fileRoute = getFileRoute(outputName); // 取得該頁籤的路徑
-		byte[] outputByte = outputText.getBytes(); // 字串轉為byte
+	// 儲存Tab物件
+	public void saveTabs(String Account) {
+		String TabName = getTextPaneName();
+		Boolean isExist = sqlQuery.getSqlTabsExistResult(Account, TabName);
 		
-		// 如果沒有儲存過，就沒有路徑，那就去找newSave另存新檔
-		if (fileRoute == "") {
-			exportFile();
+		if (isExist) {
+			// update sql
 		} else {
-			try {
-				FileOutputStream fos = new FileOutputStream(fileRoute.concat(".txt")); // 串流 - 設定存文字檔
-				fos.write(outputByte); // 序列化 寫入
-				fos.flush();
-				fos.close();
-				JOptionPane.showMessageDialog(null, "儲存成功");
-			} catch (Exception e) {
-				System.err.println(e.toString()); // 印出出錯訊息
-				e.printStackTrace(); // 印出出錯位置
-			}	
+			// insert sql
+			System.out.println("in");
+			sqlinsert.setSaveTabText(Account, TabName, tabList.get(getSelectedIndex()));
 		}
-	}
+	}	
+	
+	// 儲存檔案
+//	public void saveTextPane() {
+//		String outputName = getTextPaneName(); // 取得頁籤名稱
+//		String outputText = getTextPaneText(); // 取得頁籤內容
+//		String fileRoute = getFileRoute(outputName); // 取得該頁籤的路徑
+//		byte[] outputByte = outputText.getBytes(); // 字串轉為byte
+//		
+//		// 如果沒有儲存過，就沒有路徑，那就去找newSave另存新檔
+//		if (fileRoute == "") {
+//			exportFile();
+//		} else {
+//			try {
+//				FileOutputStream fos = new FileOutputStream(fileRoute.concat(".txt")); // 串流 - 設定存文字檔
+//				fos.write(outputByte); // 序列化 寫入
+//				fos.flush();
+//				fos.close();
+//				JOptionPane.showMessageDialog(null, "儲存成功");
+//			} catch (Exception e) {
+//				System.err.println(e.toString()); // 印出出錯訊息
+//				e.printStackTrace(); // 印出出錯位置
+//			}	
+//		}
+//	}
 
 	// 開啟檔案
 	public void load() {
@@ -283,6 +328,10 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 		
 	}
 	
+}
+
+class TabsText extends JTextPane {
+	public int textSaveStatus;
 }
 
 class CloseTabIcon implements Icon {
