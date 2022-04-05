@@ -202,8 +202,9 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 			// update sql
 		} else {
 			// insert sql
-			System.out.println("in");
-			sqlinsert.setSaveTabText(Account, TabName, tabList.get(getSelectedIndex()));
+			if (sqlinsert.setSaveTabText(Account, TabName, tabList.get(getSelectedIndex()))) {
+				JOptionPane.showMessageDialog(null, "儲存成功");
+			}
 		}
 	}	
 	

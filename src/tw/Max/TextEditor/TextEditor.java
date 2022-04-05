@@ -262,7 +262,6 @@ public class TextEditor extends JFrame {
 
 	// 儲存
 	private void save() {
-//		tabbedPane.saveTextPane();
 		tabbedPane.saveTabs(this.UserAccount);
 	}
 	

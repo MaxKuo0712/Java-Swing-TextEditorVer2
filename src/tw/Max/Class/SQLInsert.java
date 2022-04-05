@@ -25,8 +25,8 @@ public class SQLInsert {
 		return createAccount(name, idNumber, account, password, gender, birth, mail, tel);
 	}
 	
-	public void setSaveTabText(String account, String textName, JTextPane text) {
-		SaveTabText(account, textName, text);
+	public Boolean setSaveTabText(String account, String textName, JTextPane text) {
+		return SaveTabText(account, textName, text);
 	}
 	
 	private Boolean createAccount(String name, String idNumber, String account, 
@@ -75,7 +75,7 @@ public class SQLInsert {
 		
 	}
 
-	private void SaveTabText(String account, String textName, JTextPane text) {
+	private Boolean SaveTabText(String account, String textName, JTextPane text) {
 		String DB = this.DB;
 		String User = this.User;
 		String Passwd = this.Passwd;
@@ -97,17 +97,18 @@ public class SQLInsert {
 			psInsertTabText.setString(2, textName);
 			psInsertTabText.setBinaryStream(3, new ByteArrayInputStream(s1Ary));
 			
-			int n = psInsertTabText.executeUpdate();
+			int insertTabText = psInsertTabText.executeUpdate();
 			
-			if (n > 0) {
-				System.out.println("OK" + n);
+			if (insertTabText > 0) {
 				conn.commit();
+				return true;
 			} else {
-				System.out.println("XX" + n);
 				conn.rollback();
+				return false;
 			}
 		} catch (Exception e) {
 			System.out.println(e.toString());
+			return false;
 		}
 	}
 }
