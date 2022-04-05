@@ -1,8 +1,13 @@
 package tw.Max.Class;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+
+import javax.swing.JTextPane;
 
 public class SQLInsert {
 	private String DB;
@@ -18,6 +23,10 @@ public class SQLInsert {
 	public Boolean setCreateAccount(String name, String idNumber, String account, 
 			String password, String gender, String birth, String mail, String tel) {
 		return createAccount(name, idNumber, account, password, gender, birth, mail, tel);
+	}
+	
+	public void setSaveTabText(String account, String textName, JTextPane text) {
+		SaveTabText(account, textName, text);
 	}
 	
 	private Boolean createAccount(String name, String idNumber, String account, 
@@ -64,5 +73,41 @@ public class SQLInsert {
 			return false;
 		}
 		
+	}
+
+	private void SaveTabText(String account, String textName, JTextPane text) {
+		String DB = this.DB;
+		String User = this.User;
+		String Passwd = this.Passwd;
+		
+		String userInfoSql = "insert into Content (Account, TabsName, TabsContentObj)"
+				+ "values (?,?,?)";
+		
+		try (Connection conn = DriverManager.getConnection(DB, User, Passwd)) {
+			conn.setAutoCommit(false);
+			
+			ByteArrayOutputStream bao = new ByteArrayOutputStream();
+			ObjectOutputStream oout = new ObjectOutputStream(bao);
+			oout.writeObject(text);
+			
+			byte[] s1Ary = bao.toByteArray();
+			
+			PreparedStatement psInsertTabText = conn.prepareStatement(userInfoSql);
+			psInsertTabText.setString(1, account);
+			psInsertTabText.setString(2, textName);
+			psInsertTabText.setBinaryStream(3, new ByteArrayInputStream(s1Ary));
+			
+			int n = psInsertTabText.executeUpdate();
+			
+			if (n > 0) {
+				System.out.println("OK" + n);
+				conn.commit();
+			} else {
+				System.out.println("XX" + n);
+				conn.rollback();
+			}
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
 	}
 }

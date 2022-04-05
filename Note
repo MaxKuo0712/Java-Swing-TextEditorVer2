@@ -55,15 +55,16 @@ maxkuo712@gmail.com
 
 -- 文字內容--
 create table Content (
-	Account varchar(100) UNIQUE not null,
-	UserIdNumber varchar(50) UNIQUE not null PRIMARY KEY,
+	Account varchar(100) UNIQUE not null PRIMARY KEY,
+	TabsName varchar(100) not null,
 	TabsContentObj BLOB not null,
 	CreateTime datetime default sysdate(),
 	ReviseTime datetime default null,
 	ReviseName varchar(100) default null
 )
 
-
+ALTER TABLE Content 
+ADD FOREIGN KEY (Account) REFERENCES account(Account)
 
 
 

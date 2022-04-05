@@ -25,6 +25,10 @@ public class SQLQuery {
 		return checkLogin(Account, Password);
 	}
 	
+	public Boolean getSqlTabsExistResult(String Account, String TabName) {
+		return isTabsExist(Account, TabName);
+	}
+	
 	private int checkLogin(String Account, String Password) {
 		String DB = this.DB;
 		String User = this.User;
@@ -40,14 +44,6 @@ public class SQLQuery {
 			if(result.next()) {
 				String hashpasswd = result.getString("Passwd");
 				if (BCrypt.checkpw(Password, hashpasswd)) {
-//					String userName = result.getString("Passwd");
-//					String userIdNumber = result.getString("Passwd");
-//					String userAccount = result.getString("Passwd");
-//					String userGender = result.getString("Passwd");
-//					String userBirth = result.getString("Passwd");
-//					String userMail = result.getString("Passwd");
-//					String userTel = result.getString("Passwd");
-					
 					return 1; // 登入成功
 				} else {
 					return 2; // 密碼錯誤
@@ -58,6 +54,35 @@ public class SQLQuery {
 		} catch (Exception e) {
 			System.out.println(e.toString());
 			return 4; // 出事
+		}
+	}
+	
+	private Boolean isTabsExist(String Account, String TabName) {
+		String DB = this.DB;
+		String User = this.User;
+		String Passwd = this.Passwd;
+		
+		String sql = "select * from Content where account = ? and TabName = ?";
+
+		try(Connection conn = DriverManager.getConnection(DB, User, Passwd)) {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, Account);
+			ps.setString(2, TabName);
+			
+			ResultSet result = ps.executeQuery();	
+			if(result.next()) {
+				String TabsName = result.getString("TabsName");
+				if (TabsName != null) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			return false; // 出事
 		}
 	}
 }
