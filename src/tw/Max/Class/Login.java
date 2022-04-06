@@ -13,18 +13,15 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import tw.Max.TextEditor.TextEditor;
-
 public class Login extends JFrame {
 	private JTextField userAccount;
 	private JPasswordField userPassword;
 	private JButton loginButton, registerButton;
 	private JLabel userAccountLabel, userPasswordLabel;
 	private JPanel body, footer;
-	private SQLQuery sqlQuery;
-	private String DB;
-	private String Account; // 取得輸入的帳號
-	private String Password; // 取得輸入的密碼
+	private String DB = "MiddleProject";
+	private String Account = "root"; // 取得輸入的帳號
+	private String Password = ""; // 取得輸入的密碼
 	
 	public Login() {
 		// 建立視窗
@@ -81,11 +78,6 @@ public class Login extends JFrame {
 			}
 		});
 		
-		DB = "MiddleProject";
-		Account = "root"; // 取得輸入的帳號
-		Password = ""; // 取得輸入的密碼
-		sqlQuery = new SQLQuery(DB, Account, Password);
-		
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
@@ -93,6 +85,7 @@ public class Login extends JFrame {
 	private Boolean checkLogin() {
 		String Account = getUserAccount();
 		String Password = getUserPassword();
+		SQLQuery sqlQuery = new SQLQuery(this.DB, this.Account, this.Password);
 		int checkResult = sqlQuery.querySqlLoginResult(Account, Password);
 		
 		if (checkResult == 0) {

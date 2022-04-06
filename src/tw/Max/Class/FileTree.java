@@ -47,25 +47,27 @@ public class FileTree extends JTree {
 		Boolean backupStatus = sqlInsert.insertTabTextBackup(account, tabName);
 		
 		// 成功備份才能刪除檔案
-		if (backupStatus) {
-			// 刪除檔案
-			Boolean deleteStatus = sqlDelete.deleteTabText(account, tabName);
-			
-			// 刪除成功才能刪除Tree Node
-			if (deleteStatus) {
-				// 刪除Tree Node
-				root.remove(index);
-				model = new DefaultTreeModel(root);
-				setModel(model);
-				JOptionPane.showMessageDialog(null, "刪除成功");
-			} else {
-				JOptionPane.showMessageDialog(null, "刪除失敗");
+		if (isDelete()) {
+			if (backupStatus) {
+				// 刪除檔案
+				Boolean deleteStatus = sqlDelete.deleteTabText(account, tabName);
+				
+				// 刪除成功才能刪除Tree Node
+				if (deleteStatus) {
+					// 刪除Tree Node
+					root.remove(index);
+					model = new DefaultTreeModel(root);
+					setModel(model);
+					JOptionPane.showMessageDialog(null, "刪除成功");
+				} else {
+					JOptionPane.showMessageDialog(null, "刪除失敗");
+				}
 			}
 		}
 	}
 	
 	private boolean isDelete() {
-		int isClose = JOptionPane.showConfirmDialog(null, "確定要	關閉該頁籤？", "關閉頁籤", JOptionPane.YES_NO_OPTION);
+		int isClose = JOptionPane.showConfirmDialog(null, "確定要	刪除該頁籤？", "刪除頁籤", JOptionPane.YES_NO_OPTION);
 		if (isClose == 0) {
 			return true;
 		} else {
