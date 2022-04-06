@@ -11,8 +11,6 @@ import javax.swing.*;
 public class TabbedPane extends JTabbedPane implements MouseListener{
 	private JTextPane textPane;
 	private String UserAccount;
-//	private SQLQuery sqlQuery;
-//	private SQLInsert sqlinsert;
 	private String DB = "MiddleProject";
 	private String Account = "root"; // 取得輸入的帳號
 	private String Password = ""; // 取得輸入的密碼
@@ -26,12 +24,6 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 		tabNameMap = new HashMap<>(); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
 		tabList = new LinkedList<>(); // 存下JTextPane
 		addMouseListener(this);
-		
-//		DB = "MiddleProject";
-//		Account = "root"; // 取得輸入的帳號
-//		Password = ""; // 取得輸入的密碼
-//		sqlQuery = new SQLQuery(DB, Account, Password);
-//		sqlinsert = new SQLInsert(DB, Account, Password);
 		
 		// 視窗頁籤
 		setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);

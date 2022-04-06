@@ -287,7 +287,7 @@ public class TextEditor extends JFrame {
 		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getParent();
 		if (parent != null) {
 			int selectedIndex = parent.getIndex(path);
-			tree.removeFileTreeNode(selectedIndex);
+			tree.removeFileTreeNode(this.UserAccount, selectedIndex);
 		}
 	}
 	
