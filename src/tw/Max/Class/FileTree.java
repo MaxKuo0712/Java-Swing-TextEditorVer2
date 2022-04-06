@@ -67,7 +67,7 @@ public class FileTree extends JTree {
 	}
 	
 	private boolean isDelete() {
-		int isClose = JOptionPane.showConfirmDialog(null, "確定要	關閉該頁籤？", "關閉頁籤", JOptionPane.YES_NO_OPTION);
+		int isClose = JOptionPane.showConfirmDialog(null, "確定要	刪除該頁籤？", "刪除頁籤", JOptionPane.YES_NO_OPTION);
 		if (isClose == 0) {
 			return true;
 		} else {

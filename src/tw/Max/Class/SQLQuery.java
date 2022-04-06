@@ -105,7 +105,7 @@ public class SQLQuery {
 		String Passwd = this.Passwd;
 		LinkedList<String> tabs = new LinkedList<>();
 		
-		String sql = "select TabsName from Content where account = ?";
+		String sql = "select TabsName from Content where account = ? order by TabsName";
 
 		try(Connection conn = DriverManager.getConnection(DB, User, Passwd)) {
 			PreparedStatement ps = conn.prepareStatement(sql);
