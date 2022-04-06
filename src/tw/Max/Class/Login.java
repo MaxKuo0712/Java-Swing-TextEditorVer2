@@ -93,7 +93,7 @@ public class Login extends JFrame {
 	private Boolean checkLogin() {
 		String Account = getUserAccount();
 		String Password = getUserPassword();
-		int checkResult = sqlQuery.getSqlLoginResult(Account, Password);
+		int checkResult = sqlQuery.querySqlLoginResult(Account, Password);
 		
 		if (checkResult == 0) {
 			JOptionPane.showMessageDialog(null, "帳號不存在");

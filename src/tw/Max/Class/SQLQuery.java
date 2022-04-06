@@ -21,11 +21,11 @@ public class SQLQuery {
 		this.Passwd = Passwd;
 	}
 	
-	public int getSqlLoginResult(String Account, String Password) {
+	public int querySqlLoginResult(String Account, String Password) {
 		return checkLogin(Account, Password);
 	}
 	
-	public Boolean getSqlTabsExistResult(String Account, String TabName) {
+	public Boolean guerySqlTabsExistResult(String Account, String TabName) {
 		return isTabsExist(Account, TabName);
 	}
 	
@@ -62,7 +62,7 @@ public class SQLQuery {
 		String User = this.User;
 		String Passwd = this.Passwd;
 		
-		String sql = "select * from Content where account = ? and TabName = ?";
+		String sql = "select * from Content where account = ? and TabsName = ?";
 
 		try(Connection conn = DriverManager.getConnection(DB, User, Passwd)) {
 			PreparedStatement ps = conn.prepareStatement(sql);

@@ -196,7 +196,7 @@ public class Register extends JFrame {
 		String mail = getMail();
 		String tel = getTel();
 		
-		if (sqlInsert.setCreateAccount(name, idNumber, account, passwd, gender, birth, mail, tel)) {
+		if (sqlInsert.insertCreateAccount(name, idNumber, account, passwd, gender, birth, mail, tel)) {
 			return true;
 		} else {
 			return false;

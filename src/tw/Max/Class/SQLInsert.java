@@ -20,13 +20,13 @@ public class SQLInsert {
 		this.Passwd = Passwd;
 	}
 	
-	public Boolean setCreateAccount(String name, String idNumber, String account, 
+	public Boolean insertCreateAccount(String name, String idNumber, String account, 
 			String password, String gender, String birth, String mail, String tel) {
 		return createAccount(name, idNumber, account, password, gender, birth, mail, tel);
 	}
 	
-	public Boolean setSaveTabText(String account, String textName, JTextPane text) {
-		return SaveTabText(account, textName, text);
+	public Boolean insertTabText(String account, String textName, JTextPane text) {
+		return saveTabText(account, textName, text);
 	}
 	
 	private Boolean createAccount(String name, String idNumber, String account, 
@@ -75,7 +75,7 @@ public class SQLInsert {
 		
 	}
 
-	private Boolean SaveTabText(String account, String textName, JTextPane text) {
+	private Boolean saveTabText(String account, String textName, JTextPane text) {
 		String DB = this.DB;
 		String User = this.User;
 		String Passwd = this.Passwd;
