@@ -89,6 +89,25 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 		}	
 	}
 	
+	// 點擊TreeNode時載入頁籤
+	public void loadTabText(String Account, String tabName) {
+		SQLQuery sqlquery = new SQLQuery(this.DB, this.Account, this.Password);
+		
+		// sql query 出指定的檔案
+		JTextPane tabText = sqlquery.guerySqlTabsText(Account, tabName);
+
+		// add 進去頁籤
+		addDBTabs(tabText);
+	}
+	
+	// 點擊TreeNode時載入頁籤
+	public void addDBTabs(JTextPane tabText) {
+		tabList.add(tabText); // 存下JTextPane
+		tabNameMap.put(tabText.getName(), null); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
+		addTab(tabText.getName(), new CloseTabIcon(null), new JScrollPane(tabText)); // 新增頁籤
+		setSelectedIndex(getTabCount() - 1);  // 新增後, 選擇新增的tab
+	}
+	
 	// 載入頁籤時要新增頁籤及內容
 	public void addTabs(String tabName, byte[] text, File fileRoute) {
 		textPane = new JTextPane();

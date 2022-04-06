@@ -204,7 +204,29 @@ public class TextEditor extends JFrame {
 		
 		// Remove Tree Node
 		tree.addMouseListener(new MouseAdapter() {
-			private void myPopupEvent(MouseEvent e) { 
+			public void mousePressed(MouseEvent e) { 
+				if (e.isPopupTrigger()) {
+					popupEvent(e); 
+				} else if (e.getClickCount() == 2) {
+					loadTabEvent(e); 
+				}
+			} 
+			
+			// load tab
+			private void loadTabEvent(MouseEvent e) { 
+				JTree tree = (JTree)e.getSource(); 
+				TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+				if (path == null) return; 
+				
+				tree.setSelectionPath(path);	
+				DefaultMutableTreeNode doubleClickedNode = (DefaultMutableTreeNode)path.getLastPathComponent(); 
+				
+				if (doubleClickedNode.isLeaf()) {
+					loadTabText();
+			    } 
+			} 			
+			
+			private void popupEvent(MouseEvent e) { 
 				JTree tree = (JTree)e.getSource(); 
 				TreePath path = tree.getPathForLocation(e.getX(), e.getY());
 				if (path == null) return; 
@@ -226,10 +248,6 @@ public class TextEditor extends JFrame {
 				    popup.add(refreshMenuItem); 
 				    popup.show(tree, e.getX(), e.getY()); 
 			    } 
-			} 
-			
-			public void mousePressed(MouseEvent e) { 
-				if (e.isPopupTrigger()) myPopupEvent(e); 
 			} 
 		});
 	}
@@ -288,6 +306,18 @@ public class TextEditor extends JFrame {
 		if (parent != null) {
 			int selectedIndex = parent.getIndex(path);
 			tree.removeFileTreeNode(this.UserAccount, selectedIndex);
+		}
+	}
+	
+	// load text
+	private void loadTabText() {
+//		tabbedPane.loadTabText(UserAccount, null);
+		DefaultMutableTreeNode path = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getParent();
+		if (parent != null) {
+			int selectedIndex = parent.getIndex(path);
+			String tabName = tree.getNodeName(selectedIndex);
+			tabbedPane.loadTabText(this.UserAccount, tabName);
 		}
 	}
 	

@@ -1,12 +1,16 @@
 package tw.Max.Class;
 
 import java.awt.EventQueue;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.LinkedList;
 import java.util.Properties;
+
+import javax.swing.JTextPane;
 
 import tw.Max.Class.BCrypt;
 import tw.Max.TextEditor.registerFrame_Test;
@@ -32,6 +36,10 @@ public class SQLQuery {
 	
 	public LinkedList<String> guerySqlShowTabs(String Account) {
 		return loadTabs(Account);
+	}
+	
+	public JTextPane guerySqlTabsText(String Account, String TabName) {
+		return loadTabsText(Account, TabName);
 	}
 	
 	private int checkLogin(String Account, String Password) {
@@ -95,11 +103,10 @@ public class SQLQuery {
 		String DB = this.DB;
 		String User = this.User;
 		String Passwd = this.Passwd;
+		LinkedList<String> tabs = new LinkedList<>();
 		
 		String sql = "select TabsName from Content where account = ?";
 
-		LinkedList<String> tabs = new LinkedList<>(); 
-		
 		try(Connection conn = DriverManager.getConnection(DB, User, Passwd)) {
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setString(1, Account);
@@ -110,6 +117,40 @@ public class SQLQuery {
 				tabs.add(TabsName);
 			}
 			return tabs;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			return null;
+		}
+	}
+
+	private JTextPane loadTabsText(String Account, String TabName) {
+		String DB = this.DB;
+		String User = this.User;
+		String Passwd = this.Passwd;
+		Object obj = new Object();
+		
+		String sql = "select * from Content where account = ? and TabsName = ?";
+
+		try(Connection conn = DriverManager.getConnection(DB, User, Passwd)) {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, Account);
+			ps.setString(2, TabName);
+
+			ResultSet result = ps.executeQuery();
+
+			if(result.next()) {
+				InputStream ins = result.getBinaryStream("TabsContentObj");
+				ObjectInputStream oin = new ObjectInputStream(ins); // 解序列化
+				obj = oin.readObject();
+				oin.close();
+			}
+			
+			if (obj instanceof JTextPane) {
+				JTextPane a = (JTextPane) obj;
+				return (JTextPane) obj;
+			} else {
+				return null;
+			}
 		} catch (Exception e) {
 			System.out.println(e.toString());
 			return null;
