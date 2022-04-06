@@ -20,13 +20,17 @@ public class SQLInsert {
 		this.Passwd = Passwd;
 	}
 	
-	public Boolean setCreateAccount(String name, String idNumber, String account, 
+	public Boolean insertCreateAccount(String name, String idNumber, String account, 
 			String password, String gender, String birth, String mail, String tel) {
 		return createAccount(name, idNumber, account, password, gender, birth, mail, tel);
 	}
 	
-	public void setSaveTabText(String account, String textName, JTextPane text) {
-		SaveTabText(account, textName, text);
+	public Boolean insertTabText(String account, String textName, JTextPane text) {
+		return saveTabText(account, textName, text);
+	}
+	
+	public Boolean insertTabTextBackup(String account, String textName) {
+		return backupTabText(account, textName);
 	}
 	
 	private Boolean createAccount(String name, String idNumber, String account, 
@@ -75,12 +79,12 @@ public class SQLInsert {
 		
 	}
 
-	private void SaveTabText(String account, String textName, JTextPane text) {
+	private Boolean saveTabText(String account, String textName, JTextPane text) {
 		String DB = this.DB;
 		String User = this.User;
 		String Passwd = this.Passwd;
 		
-		String userInfoSql = "insert into Content (Account, TabsName, TabsContentObj)"
+		String saveTabTextSql = "insert into Content (Account, TabsName, TabsContentObj)"
 				+ "values (?,?,?)";
 		
 		try (Connection conn = DriverManager.getConnection(DB, User, Passwd)) {
@@ -92,22 +96,56 @@ public class SQLInsert {
 			
 			byte[] s1Ary = bao.toByteArray();
 			
-			PreparedStatement psInsertTabText = conn.prepareStatement(userInfoSql);
+			PreparedStatement psInsertTabText = conn.prepareStatement(saveTabTextSql);
 			psInsertTabText.setString(1, account);
 			psInsertTabText.setString(2, textName);
 			psInsertTabText.setBinaryStream(3, new ByteArrayInputStream(s1Ary));
 			
-			int n = psInsertTabText.executeUpdate();
+			int insertTabText = psInsertTabText.executeUpdate();
 			
-			if (n > 0) {
-				System.out.println("OK" + n);
+			if (insertTabText > 0) {
 				conn.commit();
+				return true;
 			} else {
-				System.out.println("XX" + n);
 				conn.rollback();
+				return false;
 			}
 		} catch (Exception e) {
 			System.out.println(e.toString());
+			return false;
+		}
+	}
+
+	private Boolean backupTabText(String account, String textName) {
+		String DB = this.DB;
+		String User = this.User;
+		String Passwd = this.Passwd;
+		
+		String backupTabTextSql = 
+				  "insert into ContentBackup (Account, TabsName, TabsContentObj, CreateName)\n"
+				+ "select content.Account, content.TabsName, content.TabsContentObj, " + "'" + account + "'\n"
+				+ "from Content as content\n"
+				+ "where content.Account = ? and content.TabsName = ?";
+		
+		try (Connection conn = DriverManager.getConnection(DB, User, Passwd)) {
+			conn.setAutoCommit(false);
+			
+			PreparedStatement psBackupTabText = conn.prepareStatement(backupTabTextSql);
+			psBackupTabText.setString(1, account);
+			psBackupTabText.setString(2, textName);
+			
+			int insertTabText = psBackupTabText.executeUpdate();
+			
+			if (insertTabText > 0) {
+				conn.commit();
+				return true;
+			} else {
+				conn.rollback();
+				return false;
+			}
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			return false;
 		}
 	}
 }

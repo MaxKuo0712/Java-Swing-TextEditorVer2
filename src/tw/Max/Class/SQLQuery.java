@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.LinkedList;
 import java.util.Properties;
 
 import tw.Max.Class.BCrypt;
@@ -21,12 +22,16 @@ public class SQLQuery {
 		this.Passwd = Passwd;
 	}
 	
-	public int getSqlLoginResult(String Account, String Password) {
+	public int querySqlLoginResult(String Account, String Password) {
 		return checkLogin(Account, Password);
 	}
 	
-	public Boolean getSqlTabsExistResult(String Account, String TabName) {
+	public Boolean guerySqlTabsExistResult(String Account, String TabName) {
 		return isTabsExist(Account, TabName);
+	}
+	
+	public LinkedList<String> guerySqlShowTabs(String Account) {
+		return loadTabs(Account);
 	}
 	
 	private int checkLogin(String Account, String Password) {
@@ -62,7 +67,7 @@ public class SQLQuery {
 		String User = this.User;
 		String Passwd = this.Passwd;
 		
-		String sql = "select * from Content where account = ? and TabName = ?";
+		String sql = "select * from Content where account = ? and TabsName = ?";
 
 		try(Connection conn = DriverManager.getConnection(DB, User, Passwd)) {
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -83,6 +88,31 @@ public class SQLQuery {
 		} catch (Exception e) {
 			System.out.println(e.toString());
 			return false; // 出事
+		}
+	}
+	
+	private LinkedList<String> loadTabs(String Account) {
+		String DB = this.DB;
+		String User = this.User;
+		String Passwd = this.Passwd;
+		
+		String sql = "select TabsName from Content where account = ?";
+
+		LinkedList<String> tabs = new LinkedList<>(); 
+		
+		try(Connection conn = DriverManager.getConnection(DB, User, Passwd)) {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, Account);
+			
+			ResultSet result = ps.executeQuery();	
+			while(result.next()) {
+				String TabsName = result.getString("TabsName");
+				tabs.add(TabsName);
+			}
+			return tabs;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			return null;
 		}
 	}
 }

@@ -121,7 +121,7 @@ public class TextEditor extends JFrame {
 		fileMenu.add(export);
 		
 		// 開啟檔案
-		load = new JMenuItem("開啟檔案");
+		load = new JMenuItem("匯入檔案");
 		fileMenu.add(load);
 		
 		// Tree
@@ -194,7 +194,7 @@ public class TextEditor extends JFrame {
 			}
 		});
 		
-		// 開啟檔案
+		// 匯入檔案
 		load.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -255,15 +255,20 @@ public class TextEditor extends JFrame {
 	// 新增頁籤
 	private void addSheet() {
 		// 如果頁籤新增成功才新增tree node
-		if (tabbedPane.addNewTabs()) {
-			tree.addFileTreeNode(tabbedPane.getTextPaneName());
-		}
+//		if (tabbedPane.addNewTabs()) {
+//			tree.addFileTreeNode(tabbedPane.getTextPaneName());
+//		}
+		tabbedPane.addNewTabs();
 	}
 
 	// 儲存
 	private void save() {
-//		tabbedPane.saveTextPane();
-		tabbedPane.saveTabs(this.UserAccount);
+		int saveResult = tabbedPane.saveTabs(this.UserAccount);
+		if (saveResult == 1) {
+			
+		} else if (saveResult == 2) {
+			tree.addFileTreeNode(tabbedPane.getTextPaneName());
+		}
 	}
 	
 	// 匯出檔案
@@ -271,7 +276,7 @@ public class TextEditor extends JFrame {
 		tabbedPane.exportFile();
 	}
 
-	// 開啟檔案
+	// 匯入檔案
 	private void load() {
 		tabbedPane.load();
 	}
@@ -282,7 +287,7 @@ public class TextEditor extends JFrame {
 		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getParent();
 		if (parent != null) {
 			int selectedIndex = parent.getIndex(path);
-			tree.removeFileTreeNode(selectedIndex);
+			tree.removeFileTreeNode(this.UserAccount, selectedIndex);
 		}
 	}
 	

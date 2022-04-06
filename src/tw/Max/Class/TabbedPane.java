@@ -11,11 +11,9 @@ import javax.swing.*;
 public class TabbedPane extends JTabbedPane implements MouseListener{
 	private JTextPane textPane;
 	private String UserAccount;
-	private SQLQuery sqlQuery;
-	private SQLInsert sqlinsert;
-	private String DB;
-	private String Account; // 取得輸入的帳號
-	private String Password; // 取得輸入的密碼
+	private String DB = "MiddleProject";
+	private String Account = "root"; // 取得輸入的帳號
+	private String Password = ""; // 取得輸入的密碼
 	private HashMap<String, String> tabNameMap;
 	private LinkedList<JTextPane> tabList;
 	
@@ -26,12 +24,6 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 		tabNameMap = new HashMap<>(); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
 		tabList = new LinkedList<>(); // 存下JTextPane
 		addMouseListener(this);
-		
-		DB = "MiddleProject";
-		Account = "root"; // 取得輸入的帳號
-		Password = ""; // 取得輸入的密碼
-		sqlQuery = new SQLQuery(DB, Account, Password);
-		sqlinsert = new SQLInsert(DB, Account, Password);
 		
 		// 視窗頁籤
 		setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -55,7 +47,9 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 	private Boolean isSaveDB() {
 		String TabName = getTextPaneName();
 		String UserAccount = this.UserAccount;
-		Boolean checkSaveResult = sqlQuery.getSqlTabsExistResult(UserAccount, TabName);
+		SQLQuery sqlQuery = new SQLQuery(this.DB, this.Account, this.Password);
+		
+		Boolean checkSaveResult = sqlQuery.guerySqlTabsExistResult(UserAccount, TabName);
 		
 		if (checkSaveResult) {
 			return true;
@@ -194,16 +188,32 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 	}
 	
 	// 儲存Tab物件
-	public void saveTabs(String Account) {
+	public int saveTabs(String Account) {
 		String TabName = getTextPaneName();
-		Boolean isExist = sqlQuery.getSqlTabsExistResult(Account, TabName);
+		SQLQuery sqlQuery = new SQLQuery(this.DB, this.Account, this.Password);
+		SQLInsert sqlInsert = new SQLInsert(this.DB, this.Account, this.Password);
+		SQLUpdate sqlUpdate = new SQLUpdate(this.DB, this.Account, this.Password);
+		
+		Boolean isExist = sqlQuery.guerySqlTabsExistResult(Account, TabName);
 		
 		if (isExist) {
 			// update sql
+			if (sqlUpdate.updateTabText(Account, TabName, tabList.get(getSelectedIndex()))) {
+				JOptionPane.showMessageDialog(null, "儲存成功");
+				return 1; // update 不用新增Tree Node
+			} else {
+				JOptionPane.showMessageDialog(null, "儲存失敗");
+				return 0; // insert失敗 要新增Tree Node
+			}
 		} else {
 			// insert sql
-			System.out.println("in");
-			sqlinsert.setSaveTabText(Account, TabName, tabList.get(getSelectedIndex()));
+			if (sqlInsert.insertTabText(Account, TabName, tabList.get(getSelectedIndex()))) {
+				JOptionPane.showMessageDialog(null, "儲存成功");
+				return 2; // insert 要新增Tree Node
+			} else {
+				JOptionPane.showMessageDialog(null, "儲存失敗");
+				return 0; // insert失敗 要新增Tree Node
+			}
 		}
 	}	
 	
@@ -231,11 +241,11 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 //		}
 //	}
 
-	// 開啟檔案
+	// 匯入檔案
 	public void load() {
 		//彈出檔案選擇框
 		JFileChooser chooser = new JFileChooser();
-		chooser.setDialogTitle("開啟舊檔");
+		chooser.setDialogTitle("匯入檔案");
 
 		if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {	//假如使用者選擇了儲存
 			try {
