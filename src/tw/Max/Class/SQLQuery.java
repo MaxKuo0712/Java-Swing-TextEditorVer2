@@ -13,7 +13,6 @@ import java.util.Properties;
 import javax.swing.JTextPane;
 
 import tw.Max.Class.BCrypt;
-import tw.Max.TextEditor.registerFrame_Test;
 
 public class SQLQuery {
 	private String DB;

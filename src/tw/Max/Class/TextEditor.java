@@ -1,15 +1,17 @@
-package tw.Max.TextEditor;
+package tw.Max.Class;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
-import javax.swing.JButton;
+import javax.swing.Action;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -18,21 +20,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
-import javax.swing.plaf.basic.BasicOptionPaneUI.ButtonActionListener;
+import javax.swing.text.StyledEditorKit;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-
-import tw.Max.Class.FileTree;
-import tw.Max.Class.Login;
-import tw.Max.Class.TabbedPane;
 
 public class TextEditor extends JFrame {
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
 	private JMenuItem addSheet, save, export, load;
-	private JComboBox<String> colorComboBox, fontComboBox, sizeComboBox;
+	private JComboBox<String> colorComboBox, fontComboBox, sizeComboBox, styleComboBox;
 	private JPanel topPanel, mainPanel, textPanel;
 	private TabbedPane tabbedPane;
 	public FileTree tree;
@@ -41,7 +37,7 @@ public class TextEditor extends JFrame {
 	public TextEditor(String UserAccount) {
 		// 定義視窗
 		super("Text Editor");
-		setSize(640, 480);
+		setSize(800, 600);
 		setLayout(new BorderLayout());
 		setLocationRelativeTo(null);
 		
@@ -64,36 +60,30 @@ public class TextEditor extends JFrame {
 		
 		// 字體調整
 		fontComboBox = new JComboBox<String>();
-		fontComboBox.addItem("--字體調整--");
-		fontComboBox.addItem("蘋方");
-		fontComboBox.addItem("黑體");
-		fontComboBox.addItem("楷體");
-		fontComboBox.addItem("儷黑 Pro");
-		fontComboBox.addItem("儷宋 Pro");
-		fontComboBox.addItem("Arial");
-		fontComboBox.addItem("Calibri");
-		fontComboBox.addItem("Lucida Grande");
+		fontComboBox.setModel(
+				new DefaultComboBoxModel<String>(new String[] {"--字體調整--", 
+						"蘋方", "黑體", "楷體", "儷黑 Pro", "儷宋 Pro", "Arial", "Calibri", 
+						"Lucida Grande", "Times New Roman", "Symbol"}));
 		topPanel.add(fontComboBox);
 		
 		// 字體大小
 		sizeComboBox = new JComboBox<String>();
-		sizeComboBox.addItem("--字體大小--");
-		sizeComboBox.addItem("9");
-		sizeComboBox.addItem("10");
-		sizeComboBox.addItem("11");
-		sizeComboBox.addItem("12");
-		sizeComboBox.addItem("16");
-		sizeComboBox.addItem("24");
-		sizeComboBox.addItem("36");
+		sizeComboBox.setModel(
+				new DefaultComboBoxModel<String>(new String[] {"--字體大小--", 
+						"8", "10", "12", "14", "16", "18", "24", "36"}));
 		topPanel.add(sizeComboBox);
 		
 		// 字體顏色
 		colorComboBox = new JComboBox<String>();
-		colorComboBox.addItem("--字體顏色--");
-		colorComboBox.addItem("紅");
-		colorComboBox.addItem("藍");
-		colorComboBox.addItem("黑");
+		colorComboBox.setModel(
+				new DefaultComboBoxModel<String>(new String[] {"--字體顏色--", "紅", "藍", "黑"}));
 		topPanel.add(colorComboBox);
+		
+		// 字體樣式
+		styleComboBox = new JComboBox<String>();
+		styleComboBox.setModel(
+				new DefaultComboBoxModel<String>(new String[] {"--字體樣式--", "粗體", "下底線", "斜體"}));
+		topPanel.add(styleComboBox);
 		
 		// textarea, tabs
 		textPanel = new JPanel();
@@ -141,26 +131,34 @@ public class TextEditor extends JFrame {
 	
 	private void setListener() {
 		// 字體調整
-		fontComboBox.addActionListener(new ActionListener() {
+		fontComboBox.addItemListener(new ItemListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void itemStateChanged(ItemEvent e) {
 				setTextAreaFont();
 			}
 		});
 		
 		// 字體大小
-		sizeComboBox.addActionListener(new ActionListener() {
+		sizeComboBox.addItemListener(new ItemListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void itemStateChanged(ItemEvent e) {
 				setTextAreaFontSize();
 			}
 		});
 		
 		// 字體顏色
-		colorComboBox.addActionListener(new ActionListener() {
+		colorComboBox.addItemListener(new ItemListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void itemStateChanged(ItemEvent e) {
 				setTextAreaFontColor();
+			}
+		});
+		
+		// 字體樣式
+		styleComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				setTextAreaFontStyle();
 			}
 		});
 		
@@ -255,27 +253,71 @@ public class TextEditor extends JFrame {
 	// 設定字體
 	private void setTextAreaFont() {
 		String font = fontComboBox.getSelectedItem().toString();
-		tabbedPane.setTextPaneFont(font);
+		Action setFont = null;
+		if (tabbedPane.getTabCount() > 0) {
+			if (font == "蘋方") {
+				setFont = new StyledEditorKit.FontFamilyAction(font, "PingFang");
+			} else if (font == "黑體") {
+				setFont = new StyledEditorKit.FontFamilyAction(font, "STHeiti");
+			} else if (font == "楷體") {
+				setFont = new StyledEditorKit.FontFamilyAction(font, "STKaiti");
+			} else if (font == "儷黑 Pro") {
+				setFont = new StyledEditorKit.FontFamilyAction(font, "LiHei Pro");
+			} else if (font == "儷宋 Pro") {
+				setFont = new StyledEditorKit.FontFamilyAction(font, "LiSong Pro");
+			} else {
+				setFont = new StyledEditorKit.FontFamilyAction(font, font);
+			}
+			fontComboBox.setAction(setFont);
+		}
 	}
 	
 	// 設定字體大小
 	private void setTextAreaFontSize() {
-		String fontSize = sizeComboBox.getSelectedItem().toString();
-		tabbedPane.setTextPaneFontSize(fontSize);
+		if (tabbedPane.getTabCount() > 0) {
+			String fontSize = sizeComboBox.getSelectedItem().toString();
+			Action setFontSize = new StyledEditorKit.FontSizeAction(fontSize, Integer.parseInt(fontSize));
+			sizeComboBox.setAction(setFontSize);
+		}
 	}
 	
 	// 設定字體顏色
 	private void setTextAreaFontColor() {
-		String fontColor = colorComboBox.getSelectedItem().toString();
-		tabbedPane.setTextPaneFontColor(fontColor);
+		if (tabbedPane.getTabCount() > 0) {
+			String fontColor = colorComboBox.getSelectedItem().toString();
+			Action setFontColor = null;
+			if (fontColor == "紅") {
+				setFontColor = new StyledEditorKit.ForegroundAction(fontColor, Color.red);
+			} else if (fontColor == "藍") {
+				setFontColor = new StyledEditorKit.ForegroundAction(fontColor, Color.blue);
+			} else if (fontColor == "黑") {
+				setFontColor = new StyledEditorKit.ForegroundAction(fontColor, Color.black);
+			}
+			colorComboBox.setAction(setFontColor);
+		}
+	}
+	
+	// 設定字體樣式
+	private void setTextAreaFontStyle() {
+		if (tabbedPane.getTabCount() > 0) {
+			String fontstyle = styleComboBox.getSelectedItem().toString();
+			Action setFontStyle = null;
+			if (fontstyle == "粗體") {
+				setFontStyle = new StyledEditorKit.BoldAction();
+				setFontStyle.putValue(Action.NAME, "Bold");
+			} else if (fontstyle == "下底線") {
+				setFontStyle = new StyledEditorKit.UnderlineAction();
+				setFontStyle.putValue(Action.NAME, "Underline");
+			} else if (fontstyle == "斜體") {
+				setFontStyle = new StyledEditorKit.ItalicAction();
+				setFontStyle.putValue(Action.NAME, "Italic");
+			}
+			styleComboBox.setAction(setFontStyle);
+		}
 	}
 	
 	// 新增頁籤
 	private void addSheet() {
-		// 如果頁籤新增成功才新增tree node
-//		if (tabbedPane.addNewTabs()) {
-//			tree.addFileTreeNode(tabbedPane.getTextPaneName());
-//		}
 		tabbedPane.addNewTabs();
 	}
 
@@ -311,7 +353,6 @@ public class TextEditor extends JFrame {
 	
 	// load text
 	private void loadTabText() {
-//		tabbedPane.loadTabText(UserAccount, null);
 		DefaultMutableTreeNode path = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getParent();
 		if (parent != null) {
@@ -320,11 +361,6 @@ public class TextEditor extends JFrame {
 			tabbedPane.loadTabText(this.UserAccount, tabName);
 		}
 	}
-	
-	// 程式進入點
-//	public static void main(String[] args) {
-//		new TextEditor();
-//	}
 }
 
 

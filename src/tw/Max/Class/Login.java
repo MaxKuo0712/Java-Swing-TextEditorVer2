@@ -13,8 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import tw.Max.TextEditor.TextEditor;
-
 public class Login extends JFrame {
 	private JTextField userAccount;
 	private JPasswordField userPassword;
@@ -87,7 +85,7 @@ public class Login extends JFrame {
 	private Boolean checkLogin() {
 		String Account = getUserAccount();
 		String Password = getUserPassword();
-		SQLQuery sqlQuery = new SQLQuery(DB, Account, Password);
+		SQLQuery sqlQuery = new SQLQuery(this.DB, this.Account, this.Password);
 		int checkResult = sqlQuery.querySqlLoginResult(Account, Password);
 		
 		if (checkResult == 0) {

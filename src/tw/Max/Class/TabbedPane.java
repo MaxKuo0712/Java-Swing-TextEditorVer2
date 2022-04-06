@@ -2,10 +2,6 @@ package tw.Max.Class;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -295,50 +291,6 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 			}	
 		}
 	}
-	
-	// 設定字體，有頁籤才能執行
-	public void setTextPaneFont(String item) {
-		JTextPane TextPane = getTextPane();
-		String textFont = null;
-		if (tabList.size() > 0) {
-			if (item == "蘋方") {
-				textFont = "PingFang";
-			} else if (item == "黑體") {
-				textFont = "STHeiti";
-			} else if (item == "楷體") {
-				textFont = "STKaiti";
-			} else if (item == "儷黑 Pro") {
-				textFont = "LiHei Pro";
-			} else if (item == "儷宋 Pro") {
-				textFont = "LiSong Pro";
-			} else {
-				textFont = item;
-			}
-		}
-		TextPane.setFont(new Font(textFont, TextPane.getFont().getStyle(), TextPane.getFont().getSize()));
-	}
-	
-	// 設定字體大小，有頁籤才能執行
-	public void setTextPaneFontSize(String item) {
-		if (tabList.size() > 0) {
-			JTextPane TextPane = getTextPane();
-			TextPane.setFont(new Font(TextPane.getFont().getFontName(), TextPane.getFont().getStyle(), Integer.parseInt(item)));
-		}
-	}
-	
-	// 設定顏色，有頁籤才能執行
-	public void setTextPaneFontColor(String item) {
-		if (tabList.size() > 0) {
-			JTextPane TextPane = getTextPane();
-			if (item == "紅") {
-				TextPane.setForeground(Color.red);
-			} else if (item == "藍") {
-				TextPane.setForeground(Color.blue);
-			} else if (item == "黑") {
-				TextPane.setForeground(Color.black);
-			}
-		}
-	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -364,10 +316,6 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 		
 	}
 	
-}
-
-class TabsText extends JTextPane {
-	public int textSaveStatus;
 }
 
 class CloseTabIcon implements Icon {

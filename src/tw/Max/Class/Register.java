@@ -38,10 +38,9 @@ public class Register extends JFrame {
 	private JButton submitButton, cancelButton;
 	private JDatePicker birthDatePicker; 
 	String gender[] = {"男", "女"};
-	private SQLInsert sqlInsert;
-	private String DB;
-	private String Account; // 取得輸入的帳號
-	private String Password; // 取得輸入的密碼
+	private String DB = "MiddleProject";
+	private String Account = "root"; // 取得輸入的帳號
+	private String Password = ""; // 取得輸入的密碼
 
 	public Register() {
 		super("建立您的帳戶");
@@ -167,12 +166,7 @@ public class Register extends JFrame {
 				dispose();
 			}
 		});
-		
-		DB = "MiddleProject";
-		Account = "root"; // 取得輸入的帳號
-		Password = ""; // 取得輸入的密碼
-		sqlInsert = new SQLInsert(DB, Account, Password);
-		
+
 		setVisible(true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
@@ -187,6 +181,7 @@ public class Register extends JFrame {
 	}
 	
 	private Boolean createAccount() {
+		SQLInsert sqlInsert = new SQLInsert(DB, Account, Password);
 		String name = getUserName();
 		String idNumber = getIdNumber();
 		String account = getAccount();
@@ -195,7 +190,7 @@ public class Register extends JFrame {
 		String birth = getBirth();
 		String mail = getMail();
 		String tel = getTel();
-		
+
 		if (sqlInsert.insertCreateAccount(name, idNumber, account, passwd, gender, birth, mail, tel)) {
 			return true;
 		} else {
@@ -244,9 +239,4 @@ public class Register extends JFrame {
 	private String getTel() {
 		return telField.getText();
 	}
-
-//	public static void main(String[] args) {
-//		new Register();
-//	}
-
 }
