@@ -107,14 +107,15 @@ public class ChangePasswd extends JFrame {
 		submitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				// 兩組新密碼必須相等、舊的帳號及密碼必須正確
 				if (checkNewPasswd() && checkOriPasswd()) {
+					// sql更改密碼
 					if (setNewPasswd()) {
 						JOptionPane.showMessageDialog(null, "更改成功");
-						dispose();
+						dispose(); // 完成後關閉
 					} else {
 						JOptionPane.showMessageDialog(null, "更改失敗");
-						clear();
+						clear(); // 更改失敗 清空輸入框
 					}
 				}
 			}
@@ -151,6 +152,7 @@ public class ChangePasswd extends JFrame {
 		}
 	}
 	
+	// sql更改密碼
 	private Boolean setNewPasswd() {
 		String Account = getUserAccount();
 		String Password = BCrypt.hashpw(getNewPassword(), BCrypt.gensalt());

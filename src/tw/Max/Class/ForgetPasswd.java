@@ -82,7 +82,7 @@ public class ForgetPasswd extends JFrame {
 		submitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				checkUserInfo();
+				infoUser();
 			}
 		});
 		
@@ -95,18 +95,31 @@ public class ForgetPasswd extends JFrame {
 		});
 	}
 	
-	private void checkUserInfo() {
-		String Account = getUserAccount();
-		String Mail = getUserMail();
-		SQLQuery sqlQuery = new SQLQuery(this.DB, this.Account, this.Password);
-		Boolean checkMail = sqlQuery.queryUserMail(Account, Mail);
+	private void infoUser() {
+		String account = getUserAccount();
+		String mail = getUserMail();
+		Boolean checkMail = checkMail(account, mail);
 		
 		if (checkMail) {
 			String randomPasswd = getRandomPasswd(); // 產生亂數密碼
-			SendEmail sendEmail = new SendEmail(Mail, Mail, randomPasswd);
-			sendEmail.sendMail();
-			System.out.println("A");
+			SendEmail sendEmail = new SendEmail(mail, randomPasswd);
+			sendEmail.start();
+			setNewRandomPasswd(account, randomPasswd);
+			dispose();
+			new ChangePasswd();
 		}
+	}
+	
+	private void setNewRandomPasswd(String account, String randomPasswd) {
+		SQLUpdate sqlUpdate = new SQLUpdate(this.DB, this.Account, this.Password);
+		String newPasswd = BCrypt.hashpw(randomPasswd, BCrypt.gensalt());
+		sqlUpdate.updatePasswd(account, newPasswd);
+	}
+	
+	private Boolean checkMail(String account, String mail) {
+		SQLQuery sqlQuery = new SQLQuery(this.DB, this.Account, this.Password);
+		Boolean checkMail = sqlQuery.queryUserMail(account, mail);
+		return checkMail;
 	}
 	
 	private String getRandomPasswd() {

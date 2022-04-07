@@ -7,8 +7,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,7 +23,7 @@ public class Login extends JFrame {
 	private JPanel body, footer;
 	private String DB = "MiddleProject";
 	private String Account = "root"; // 取得輸入的帳號
-	private String Password = ""; // 取得輸入的密碼
+	protected String Password = ""; // 取得輸入的密碼
 	
 	public Login() {
 		// 建立視窗
@@ -98,7 +96,7 @@ public class Login extends JFrame {
 		registerButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new Register();
+				new Register(); // 註冊
 			}
 		});
 		
@@ -106,7 +104,7 @@ public class Login extends JFrame {
 		changePasswdButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new ChangePasswd();
+				new ChangePasswd(); // 更改密碼
 			}
 		});
 		
@@ -114,16 +112,17 @@ public class Login extends JFrame {
 		forgetPasswdButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new ForgetPasswd();
+				new ForgetPasswd(); // 忘記密碼
 			}
 		});
 	}
 	
+	// 檢查登入
 	private Boolean checkLogin() {
 		String Account = getUserAccount();
 		String Password = getUserPassword();
 		SQLQuery sqlQuery = new SQLQuery(this.DB, this.Account, this.Password);
-		int checkResult = sqlQuery.querySqlLoginResult(Account, Password);
+		int checkResult = sqlQuery.querySqlLoginResult(Account, Password); // sql檢查結果
 		
 		if (checkResult == 0) {
 			JOptionPane.showMessageDialog(null, "帳號不存在");
@@ -142,11 +141,13 @@ public class Login extends JFrame {
 		}
 	}
 	
-	public String getUserAccount() {
+	// 取得使用者帳號
+	private String getUserAccount() {
 		return userAccount.getText();
 	}
 	
-	private String getUserPassword() {
+	// 取得使用者密碼
+	protected String getUserPassword() {
 		return String.valueOf(userPassword.getPassword());
 	}
 
