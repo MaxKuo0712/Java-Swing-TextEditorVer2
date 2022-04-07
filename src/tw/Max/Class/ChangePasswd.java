@@ -1,7 +1,6 @@
 package tw.Max.Class;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,12 +17,12 @@ import javax.swing.JTextField;
 public class ChangePasswd extends JFrame {
 	private JPanel bodyPanel, footerPanel, userAccountPanel, oriPasswdPanel, newPasswdPanel, confirmPasswdPanel;
 	private JLabel userAccountLabel, oriPasswdLabel, newPasswdLabel, confirmPasswdLabel;
-	private JPasswordField oriPasswd, newPasswd, confirmPasswd;
+	protected JPasswordField oriPasswd, newPasswd, confirmPasswd;
 	private JTextField userAccount;
 	private JButton submitButton, cancelButton;
 	private String DB = "MiddleProject";
 	private String Account = "root"; // 取得輸入的帳號
-	private String Password = ""; // 取得輸入的密碼
+	protected String Password = ""; // 取得輸入的密碼
 	
 	public ChangePasswd() {
 		// 建立視窗
@@ -130,6 +129,7 @@ public class ChangePasswd extends JFrame {
 		});
 	}
 	
+	// 確認舊的帳號及密碼是否正確
 	private Boolean checkOriPasswd() {
 		String Account = getUserAccount();
 		String Password = getOriPassword();
@@ -155,12 +155,13 @@ public class ChangePasswd extends JFrame {
 	// sql更改密碼
 	private Boolean setNewPasswd() {
 		String Account = getUserAccount();
-		String Password = BCrypt.hashpw(getNewPassword(), BCrypt.gensalt());
+		String Password = BCrypt.hashpw(getNewPassword(), BCrypt.gensalt()); // 加鹽
 		SQLUpdate sqlUpdate = new SQLUpdate(this.DB, this.Account, this.Password);
 		Boolean setNewPasswdResult = sqlUpdate.updatePasswd(Account, Password);
-		return setNewPasswdResult;
+		return setNewPasswdResult; // 回傳update結果
 	}
 	
+	// 檢查兩組密碼是不是相同 (新密碼與確認密碼)
 	private Boolean checkNewPasswd() {
 		String newPasswd = getNewPassword();
 		String confirmPasswd = getConfirmPassword();
@@ -172,6 +173,7 @@ public class ChangePasswd extends JFrame {
 		}
 	}
 	
+	// 清除
 	private void clear() {
 		userAccount.setText(null);
 		oriPasswd.setText(null);
@@ -179,19 +181,23 @@ public class ChangePasswd extends JFrame {
 		confirmPasswd.setText(null);
 	}
 	
-	public String getUserAccount() {
+	// 取得使用者帳號
+	private String getUserAccount() {
 		return userAccount.getText();
 	}
 	
-	private String getOriPassword() {
+	// 取得使用者密碼
+	protected String getOriPassword() {
 		return String.valueOf(oriPasswd.getPassword());
 	}
 	
-	private String getNewPassword() {
+	// 取得使用者輸入的新密碼
+	protected String getNewPassword() {
 		return String.valueOf(newPasswd.getPassword());
 	}
 	
-	private String getConfirmPassword() {
+	// 取得使用者輸入的新密碼確認
+	protected String getConfirmPassword() {
 		return String.valueOf(confirmPasswd.getPassword());
 	}
 }

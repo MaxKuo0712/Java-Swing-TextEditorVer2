@@ -5,18 +5,15 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Calendar;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -34,13 +31,13 @@ public class Register extends JFrame {
 	private JLabel nameLabel, idLabel, accountLabel, passwdLabel, genderLabel, birthLabel, emailLabel, telLabel;
 	private JTextField nameField, idField, accountField, emailField, telField;
 	private JComboBox<String> genderComboBox;
-	private JPasswordField passwdField;
+	protected JPasswordField passwdField;
 	private JButton submitButton, cancelButton;
 	private JDatePicker birthDatePicker; 
-	String gender[] = {"男", "女"};
+	private String gender[] = {"男", "女"};
 	private String DB = "MiddleProject";
 	private String Account = "root"; // 取得輸入的帳號
-	private String Password = ""; // 取得輸入的密碼
+	protected String Password = ""; // 取得輸入的密碼
 
 	public Register() {
 		super("建立您的帳戶");
@@ -61,7 +58,8 @@ public class Register extends JFrame {
 		// body_name
 		namePanel = new JPanel();
 		bodyPanel.add(namePanel);
-		nameLabel = new JLabel("姓名");
+		
+		nameLabel = new JLabel("姓名          ");
 		namePanel.add(nameLabel);
 		
 		nameField = new JTextField();
@@ -71,6 +69,7 @@ public class Register extends JFrame {
 		// body_id
 		idPanel = new JPanel();
 		bodyPanel.add(idPanel);
+		
 		idLabel = new JLabel("身分證字號");
 		idPanel.add(idLabel);
 		
@@ -81,7 +80,8 @@ public class Register extends JFrame {
 		// body_account
 		accountPanel = new JPanel();
 		bodyPanel.add(accountPanel);
-		accountLabel = new JLabel("帳號");
+		
+		accountLabel = new JLabel("帳號          ");
 		accountPanel.add(accountLabel);
 		
 		accountField = new JTextField();
@@ -91,7 +91,8 @@ public class Register extends JFrame {
 		// body_passwd
 		passwdPanel = new JPanel();
 		bodyPanel.add(passwdPanel);
-		passwdLabel = new JLabel("密碼");
+		
+		passwdLabel = new JLabel("密碼          ");
 		passwdPanel.add(passwdLabel);
 		
 		passwdField = new JPasswordField();
@@ -101,7 +102,8 @@ public class Register extends JFrame {
 		// body_gender
 		genderPanel = new JPanel();
 		bodyPanel.add(genderPanel);
-		genderLabel = new JLabel("性別");
+		
+		genderLabel = new JLabel("性別          ");
 		genderPanel.add(genderLabel);
 		
 		genderComboBox = new JComboBox<>(gender);
@@ -110,6 +112,7 @@ public class Register extends JFrame {
 		// body_birth
 		birthPanel = new JPanel();
 		bodyPanel.add(birthPanel);
+		
 		birthLabel = new JLabel("生日");
 		birthPanel.add(birthLabel);
 
@@ -120,7 +123,8 @@ public class Register extends JFrame {
 		// body_email
 		emailPanel = new JPanel();
 		bodyPanel.add(emailPanel);
-		emailLabel = new JLabel("信箱");
+		
+		emailLabel = new JLabel("信箱          ");
 		emailPanel.add(emailLabel);
 		
 		emailField = new JTextField();
@@ -130,7 +134,8 @@ public class Register extends JFrame {
 		// body_tel
 		telPanel = new JPanel();
 		bodyPanel.add(telPanel);
-		telLabel = new JLabel("電話");
+		
+		telLabel = new JLabel("電話          ");
 		telPanel.add(telLabel);
 		
 		telField = new JTextField();
@@ -157,21 +162,22 @@ public class Register extends JFrame {
 	}
 	
 	private void setListener() {
-		// footer_submit
+		// 建立帳號
 		submitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// sql insert帳號資料
 				if (createAccount()) {
 					JOptionPane.showMessageDialog(null, "歡迎加入！");
 					dispose();
 				} else {
 					JOptionPane.showMessageDialog(null, "建立錯誤，請重新輸入");
-					initRegisterInput();
+					initRegisterInput(); // 重置輸入框
 				}
 			}
 		});
 		
-		// footer_cancel
+		// 取消建立
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -180,6 +186,7 @@ public class Register extends JFrame {
 		});
 	}
 	
+	// 重置輸入框
 	private void initRegisterInput() {
 		nameField.setText("");
 		idField.setText("");
@@ -189,6 +196,7 @@ public class Register extends JFrame {
 		telField.setText("");
 	}
 	
+	// sql insert帳號資料
 	private Boolean createAccount() {
 		SQLInsert sqlInsert = new SQLInsert(DB, Account, Password);
 		String name = getUserName();
@@ -199,7 +207,8 @@ public class Register extends JFrame {
 		String birth = getBirth();
 		String mail = getMail();
 		String tel = getTel();
-
+		
+		// 執行insert並回傳結果
 		if (sqlInsert.insertCreateAccount(name, idNumber, account, passwd, gender, birth, mail, tel)) {
 			return true;
 		} else {
@@ -207,34 +216,44 @@ public class Register extends JFrame {
 		}	
 	}
 	
+	// 取得名字
 	private String getUserName() {
 		return nameField.getText();
 	}
 	
-	private String getIdNumber() {
+	// 取得身分證字號
+	protected String getIdNumber() {
 		return idField.getText();
 	}
 	
+	// 取得帳號
 	private String getAccount() {
 		return accountField.getText();
 	}
 	
-	private String getPassword() {
+	// 取得密碼 加鹽
+	protected String getPassword() {
 		String inputPasswd = String.valueOf(passwdField.getPassword());
 		String passwd = BCrypt.hashpw(inputPasswd, BCrypt.gensalt());
 		return passwd;
 	}
 	
+	// 取得性別
 	private String getGender() {
 		return genderComboBox.getSelectedItem().toString();
 	}
 	
 	private String getBirth() {
 		SimpleDateFormat f1 = new SimpleDateFormat("yyyy-MM-dd");
-		LocalDate targetDate = (LocalDate) birthDatePicker.getModel().getValue();
+		int year = birthDatePicker.getModel().getYear();
+		int month = birthDatePicker.getModel().getMonth();
+		int day = birthDatePicker.getModel().getDay();
+		LocalDate targetDate = LocalDate.of(year, month, day);
+		Instant instant = targetDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+		Date birthDate = Date.from(instant);
 		
 		if (targetDate.isBefore(LocalDate.now())) {
-			return f1.format(targetDate);
+			return f1.format(birthDate);
 		} else {
 			JOptionPane.showMessageDialog(null, "請輸入正確出生日期");
 			return null;

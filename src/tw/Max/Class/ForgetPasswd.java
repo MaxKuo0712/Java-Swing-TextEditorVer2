@@ -20,7 +20,7 @@ public class ForgetPasswd extends JFrame {
 	private JButton submitButton, cancelButton;
 	private String DB = "MiddleProject";
 	private String Account = "root"; // 取得輸入的帳號
-	private String Password = ""; // 取得輸入的密碼
+	protected String Password = ""; // 取得輸入的密碼
 	
 	public ForgetPasswd() {
 		// 建立視窗
@@ -82,7 +82,7 @@ public class ForgetPasswd extends JFrame {
 		submitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				infoUser();
+				infoUser(); // 發送mail通知使用者
 			}
 		});
 		
@@ -96,34 +96,39 @@ public class ForgetPasswd extends JFrame {
 	}
 	
 	private void infoUser() {
-		String account = getUserAccount();
-		String mail = getUserMail();
-		Boolean checkMail = checkMail(account, mail);
+		String account = getUserAccount(); // 取得使用者帳號
+		String mail = getUserMail(); // 取得使用者密碼
+		Boolean checkMail = checkMail(account, mail); // 檢查帳號及信箱是否存在
 		
 		if (checkMail) {
-			String randomPasswd = getRandomPasswd(); // 產生亂數密碼
-			SendEmail sendEmail = new SendEmail(mail, randomPasswd);
-			sendEmail.start();
-			setNewRandomPasswd(account, randomPasswd);
-			dispose();
-			new ChangePasswd();
+			String randomPasswd = getRandomPasswd(); // 取得產生的亂數密碼
+			SendEmail sendEmail = new SendEmail(mail, randomPasswd); // 寄mail class
+			sendEmail.start(); // 因為寄送mail需要時間 所以用執行緒方式處理 在前端的感受上較佳
+			setNewRandomPasswd(account, randomPasswd); // update新密碼進資料庫
+			dispose(); // 關密忘記密碼的視窗
+			new ChangePasswd(); // 替使用者開啟更改密碼的視窗
+		} else {
+			JOptionPane.showMessageDialog(null, "帳號或郵件不存在");
 		}
 	}
 	
+	// update新密碼進資料庫 要加鹽
 	private void setNewRandomPasswd(String account, String randomPasswd) {
 		SQLUpdate sqlUpdate = new SQLUpdate(this.DB, this.Account, this.Password);
 		String newPasswd = BCrypt.hashpw(randomPasswd, BCrypt.gensalt());
 		sqlUpdate.updatePasswd(account, newPasswd);
 	}
 	
+	// 檢查帳號及信箱是否存在 
 	private Boolean checkMail(String account, String mail) {
 		SQLQuery sqlQuery = new SQLQuery(this.DB, this.Account, this.Password);
 		Boolean checkMail = sqlQuery.queryUserMail(account, mail);
 		return checkMail;
 	}
 	
-	private String getRandomPasswd() {
-		//產生亂數密碼
+	//產生亂數密碼
+	protected String getRandomPasswd() {
+		// 產生8碼密碼
 		int[] word = new int[8];
         StringBuffer newPassword = new StringBuffer();
 		int mod;
@@ -131,11 +136,11 @@ public class ForgetPasswd extends JFrame {
         for( int i = 0; i < 8; i++ ) {
         	mod = (int)((Math.random() * 7) % 3);
             if(mod == 1) {    //數字
-                   word[i] = (int)((Math.random() * 10) + 48);
+            	word[i] = (int)((Math.random() * 10) + 48);
             } else if(mod == 2) {  //大寫英文
-                   word[i] = (char)((Math.random() * 26) + 65);
+        		word[i] = (char)((Math.random() * 26) + 65);
             } else {    //小寫英文
-                   word[i] = (char)((Math.random() * 26) + 97);
+            	word[i] = (char)((Math.random() * 26) + 97);
             }
          }
 
@@ -145,11 +150,13 @@ public class ForgetPasswd extends JFrame {
         return newPassword.toString();
 	}
 	
-	public String getUserAccount() {
+	// 取得使用者帳號
+	private String getUserAccount() {
 		return userAccount.getText();
 	}
 	
-	public String getUserMail() {
+	// 取得使用者mail
+	private String getUserMail() {
 		return userMail.getText();
 	}
 }
