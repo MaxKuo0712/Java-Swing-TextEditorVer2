@@ -81,10 +81,11 @@ public class SQLQuery {
 			ps.setString(1, Account);
 			ps.setString(2, TabName);
 			
-			ResultSet result = ps.executeQuery();	
+			ResultSet result = ps.executeQuery();
+			
 			if(result.next()) {
-				String TabsName = result.getString("TabsName");
-				if (TabsName != null) {
+//				String TabsName = result.getString("TabsName");
+				if (result.getRow() > 0) {
 					return true;
 				} else {
 					return false;

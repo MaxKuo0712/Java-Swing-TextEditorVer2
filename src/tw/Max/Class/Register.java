@@ -144,6 +144,20 @@ public class Register extends JFrame {
 		// footer_submit
 		submitButton = new JButton("建立");
 		footerPanel.add(submitButton);
+		
+		// footer_cancel
+		cancelButton = new JButton("取消");
+		footerPanel.add(cancelButton);
+		
+		// Listener
+		setListener();
+
+		setVisible(true);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+	}
+	
+	private void setListener() {
+		// footer_submit
 		submitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -158,17 +172,12 @@ public class Register extends JFrame {
 		});
 		
 		// footer_cancel
-		cancelButton = new JButton("取消");
-		footerPanel.add(cancelButton);
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 			}
 		});
-
-		setVisible(true);
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 	
 	private void initRegisterInput() {

@@ -1,10 +1,14 @@
 package tw.Max.Class;
 
+import java.awt.ActiveEvent;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,7 +20,7 @@ import javax.swing.JTextField;
 public class Login extends JFrame {
 	private JTextField userAccount;
 	private JPasswordField userPassword;
-	private JButton loginButton, registerButton;
+	private JButton loginButton, registerButton, forgetPasswdButton, changePasswdButton;
 	private JLabel userAccountLabel, userPasswordLabel;
 	private JPanel body, footer;
 	private String DB = "MiddleProject";
@@ -26,7 +30,7 @@ public class Login extends JFrame {
 	public Login() {
 		// 建立視窗
 		super("登入畫面");
-		setSize(190,150);
+		setSize(210,170);
 		setResizable(false); // 視窗不能拉伸大小
 		setLayout(new BorderLayout());
 		setLocationRelativeTo(null);
@@ -39,14 +43,14 @@ public class Login extends JFrame {
 		// body - userName
 		userAccountLabel = new JLabel("帳號");
 		userAccount = new JTextField();
-		userAccount.setColumns(10);
+		userAccount.setColumns(12);
 		body.add(userAccountLabel);
 		body.add(userAccount);
 		
 		// body - userPassword
 		userPasswordLabel = new JLabel("密碼");
 		userPassword = new JPasswordField();
-		userPassword.setColumns(10);
+		userPassword.setColumns(12);
 		body.add(userPasswordLabel);
 		body.add(userPassword);
 		
@@ -57,7 +61,29 @@ public class Login extends JFrame {
 
 		// footer - login
 		loginButton = new JButton("登入");
-		footer.add(loginButton);
+		body.add(loginButton);
+
+		// footer - register
+		registerButton = new JButton("註冊");
+		body.add(registerButton);
+		
+		// footer - forgetPasswd
+		forgetPasswdButton = new JButton("忘記密碼");
+		body.add(forgetPasswdButton);
+		
+		// footer - changePasswd
+		changePasswdButton = new JButton("更改密碼");
+		body.add(changePasswdButton);
+		
+		// Listener
+		setListener();
+		
+		setVisible(true);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+	}
+	
+	private void setListener() {
+		// 登入
 		loginButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -68,9 +94,7 @@ public class Login extends JFrame {
 			}
 		});
 		
-		// footer - register
-		registerButton = new JButton("註冊");
-		footer.add(registerButton);
+		// 註冊
 		registerButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -78,8 +102,13 @@ public class Login extends JFrame {
 			}
 		});
 		
-		setVisible(true);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		// 更改密碼
+		changePasswdButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new ChangePasswd();
+			}
+		});
 	}
 	
 	private Boolean checkLogin() {
@@ -116,7 +145,6 @@ public class Login extends JFrame {
 	public static void main(String[] args) {
 		new Login();
 	}
-
 }
 
 
