@@ -109,6 +109,14 @@ public class Login extends JFrame {
 				new ChangePasswd();
 			}
 		});
+		
+		// 忘記密碼
+		forgetPasswdButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new ForgetPasswd();
+			}
+		});
 	}
 	
 	private Boolean checkLogin() {
