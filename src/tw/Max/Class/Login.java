@@ -1,9 +1,7 @@
 package tw.Max.Class;
 
-import java.awt.ActiveEvent;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -17,7 +15,7 @@ import javax.swing.JTextField;
 
 public class Login extends JFrame {
 	private JTextField userAccount;
-	private JPasswordField userPassword;
+	protected JPasswordField userPassword;
 	private JButton loginButton, registerButton, forgetPasswdButton, changePasswdButton;
 	private JLabel userAccountLabel, userPasswordLabel;
 	private JPanel body, footer;
