@@ -30,6 +30,10 @@ public class SQLUpdate {
 	public Boolean updateTabText(String account, String textName, JTextPane text) {
 		return saveTabText(account, textName, text);
 	}
+	
+	public Boolean updatePasswd(String account, String newPasswd) {
+		return setPasswd(account, newPasswd);
+	}
 
 	private Boolean saveTabText(String account, String textName, JTextPane text) {
 		String DB = this.DB;
@@ -54,6 +58,36 @@ public class SQLUpdate {
 			psUpdateTabText.setString(3, account);
 			psUpdateTabText.setString(4, account);
 			psUpdateTabText.setString(5, textName);
+			
+			int insertTabText = psUpdateTabText.executeUpdate();
+			
+			if (insertTabText > 0) {
+				conn.commit();
+				return true;
+			} else {
+				conn.rollback();
+				return false;
+			}
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			return false;
+		}
+	}
+	
+	private Boolean setPasswd(String account, String newPasswd) {
+		String DB = this.DB;
+		String User = this.User;
+		String Passwd = this.Passwd;
+		
+		String updateNewPasswdSql = "update account SET Passwd = ?\n"
+				+ "where Account = ?";
+		
+		try (Connection conn = DriverManager.getConnection(DB, User, Passwd)) {
+			conn.setAutoCommit(false);
+			
+			PreparedStatement psUpdateTabText = conn.prepareStatement(updateNewPasswdSql);
+			psUpdateTabText.setString(1, newPasswd);
+			psUpdateTabText.setString(2, account);
 			
 			int insertTabText = psUpdateTabText.executeUpdate();
 			

@@ -2,15 +2,18 @@ package tw.Max.Class;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.*;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-public class TabbedPane extends JTabbedPane implements MouseListener{
+public class TabbedPane extends JTabbedPane implements MouseListener {
 	private JTextPane textPane;
 	private String UserAccount;
 	private String DB = "MiddleProject";
@@ -84,14 +87,14 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 	
 	// 新增頁籤
 	public Boolean addNewTabs() {
-		String sheetName = JOptionPane.showInputDialog("請輸入檔案名稱：");
-		sheetName = setTabName(sheetName); // 先檢查要新增的檔案名稱
-		if (!(sheetName == null)) {
+		String tabName = JOptionPane.showInputDialog("請輸入檔案名稱：");
+		tabName = setTabName(tabName); // 先檢查要新增的檔案名稱
+		if (!(tabName == null)) {
 			textPane = new JTextPane();
-			textPane.setName(sheetName); // 給予TextPane名字 以便後面使用
+			textPane.setName(tabName); // 給予TextPane名字 以便後面使用
 			tabList.add(textPane); // 存下JTextPane
-			tabNameMap.put(sheetName, ""); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
-			addTab(sheetName, new CloseTabIcon(null), new JScrollPane(textPane)); // 新增頁籤
+			tabNameMap.put(tabName, ""); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
+			addTab(tabName, new CloseTabIcon(null), new JScrollPane(textPane)); // 新增頁籤
 			setSelectedIndex(getTabCount() - 1);  // 新增後, 選擇新增的tab
 			textPane.addCaretListener(new CaretListener() {
 				@Override
@@ -243,7 +246,7 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 		if (isExist) {
 			// update sql
 			if (sqlUpdate.updateTabText(Account, TabName, tabList.get(getSelectedIndex()))) {
-				JOptionPane.showMessageDialog(null, "儲存成功");
+				JOptionPane.showMessageDialog(null, "儲存成功1");
 				setBackgroundAt(getSelectedIndex(), null); // 存檔成功 顏色回歸正常
 				return 1; // update 不用新增Tree Node
 			} else {
@@ -253,7 +256,7 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 		} else {
 			// insert sql
 			if (sqlInsert.insertTabText(Account, TabName, tabList.get(getSelectedIndex()))) {
-				JOptionPane.showMessageDialog(null, "儲存成功");
+				JOptionPane.showMessageDialog(null, "儲存成功2");
 				setBackgroundAt(getSelectedIndex(), null); // 存檔成功 顏色回歸正常
 				return 2; // insert 要新增Tree Node
 			} else {
@@ -285,6 +288,33 @@ public class TabbedPane extends JTabbedPane implements MouseListener{
 				} else {
 					JOptionPane.showMessageDialog(null, "檔案已存在於頁籤");
 				}
+			} catch (Exception e) {
+				System.err.println(e.toString()); // 印出出錯訊息
+				e.printStackTrace(); // 印出出錯位置
+			}	
+		}
+	}
+	
+	// 設定TextPane背景顏色
+	public void setBackgroundColor() {
+		if (getTabCount() > 0) {
+			Color color = JColorChooser.showDialog(new JFrame("設定背景顏色"), "選取顏色", null); // 呼叫內建JColorChooser
+			getTextPane().setBackground(color); // 設定TextPane背景顏色
+		}
+	}
+	
+	// 插入圖片
+	public void addPic() {
+		//彈出檔案選擇框
+		JFileChooser chooser = new JFileChooser();
+		chooser.setDialogTitle("插入圖片");
+
+		if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {	//假如使用者選擇了儲存
+			try {
+				String path = chooser.getSelectedFile().getPath(); // 取得路徑
+				BufferedImage inputPic = ImageIO.read(new File(path)); // 取得圖片
+				ImageIcon a = new ImageIcon(inputPic); 
+				getTextPane().insertIcon(a); // textPane內放入圖片
 			} catch (Exception e) {
 				System.err.println(e.toString()); // 印出出錯訊息
 				e.printStackTrace(); // 印出出錯位置

@@ -41,6 +41,10 @@ public class SQLQuery {
 		return loadTabsText(Account, TabName);
 	}
 	
+	public Boolean queryUserMail(String Account, String Mail) {
+		return checkMail(Account, Mail);
+	}
+	
 	private int checkLogin(String Account, String Password) {
 		String DB = this.DB;
 		String User = this.User;
@@ -81,10 +85,10 @@ public class SQLQuery {
 			ps.setString(1, Account);
 			ps.setString(2, TabName);
 			
-			ResultSet result = ps.executeQuery();	
+			ResultSet result = ps.executeQuery();
+			
 			if(result.next()) {
-				String TabsName = result.getString("TabsName");
-				if (TabsName != null) {
+				if (result.getRow() > 0) {
 					return true;
 				} else {
 					return false;
@@ -145,7 +149,6 @@ public class SQLQuery {
 			}
 			
 			if (obj instanceof JTextPane) {
-				JTextPane a = (JTextPane) obj;
 				return (JTextPane) obj;
 			} else {
 				return null;
@@ -153,6 +156,39 @@ public class SQLQuery {
 		} catch (Exception e) {
 			System.out.println(e.toString());
 			return null;
+		}
+	}
+
+	private Boolean checkMail(String Account, String Mail) {
+		String DB = this.DB;
+		String User = this.User;
+		String Passwd = this.Passwd;
+		
+		String sql = 
+				  "SELECT *  \n"
+				+ "FROM userinfo as info\n"
+				+ "	inner join Account as acc on acc.UserIdNumber = info.UserIdNumber\n"
+				+ "where acc.Account = ? and info.UserEmail = ?";
+
+		try(Connection conn = DriverManager.getConnection(DB, User, Passwd)) {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, Account);
+			ps.setString(2, Mail);
+			
+			ResultSet result = ps.executeQuery();
+			
+			if(result.next()) {
+				if (result.getRow() > 0) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			return false;
 		}
 	}
 }

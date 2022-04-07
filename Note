@@ -58,7 +58,7 @@ create table Content (
 	ContentID int not null AUTO_INCREMENT PRIMARY KEY,
 	Account varchar(100) not null,
 	TabsName varchar(100) not null,
-	TabsContentObj BLOB not null,
+	TabsContentObj LONGBLOB not null,
 	CreateTime datetime default sysdate(),
 	ReviseTime datetime default null,
 	ReviseName varchar(100) default null
@@ -72,7 +72,7 @@ create table ContentBackup (
 	BackupID int not null AUTO_INCREMENT PRIMARY KEY,
 	Account varchar(100) not null,
 	TabsName varchar(100) not null,
-	TabsContentObj BLOB not null,
+	TabsContentObj LONGBLOB not null,
 	CreateTime datetime default sysdate(),
 	CreateName varchar(100) default null
 )
