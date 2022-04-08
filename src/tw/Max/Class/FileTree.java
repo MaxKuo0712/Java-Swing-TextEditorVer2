@@ -20,7 +20,7 @@ public class FileTree extends JTree {
 		model = new DefaultTreeModel(root);
 		setModel(model);
 		
-		loadsqlTabs(UserAccount);
+		loadsqlTabs(UserAccount); // 開啟視窗時 自動放入檔案 新增Tree Node
 	}
 	
 	// 開啟視窗時 自動放入檔案 新增Tree Node
@@ -38,6 +38,7 @@ public class FileTree extends JTree {
 		setModel(new DefaultTreeModel(root));
 	}
 	
+	// 刪除Node 移除sql內資料
 	public void removeFileTreeNode(String account, int index) {
 		String tabName = getNodeName(index);
 		SQLInsert sqlInsert = new SQLInsert(this.DB, this.Account, this.Password);

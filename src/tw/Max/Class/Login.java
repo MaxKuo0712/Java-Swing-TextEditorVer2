@@ -83,8 +83,11 @@ public class Login extends JFrame {
 		loginButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (checkLogin()) {
-					new TextEditor(getUserAccount()); // 開啟主要程式
+				Boolean isLoginSuccess = checkLogin(); // 是否登入成功
+				String userAccount = getUserAccount(); // 取得輸入的使用者帳號
+				
+				if (isLoginSuccess) {
+					new TextEditor(userAccount); // 開啟主要程式
 					dispose(); // 登入成功進入主要程式後關閉
 				}
 			}

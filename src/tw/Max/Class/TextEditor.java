@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
@@ -48,7 +49,7 @@ public class TextEditor extends JFrame {
 	public TextEditor(String UserAccount) {
 		// 定義視窗
 		super("Text Editor");
-		setSize(800, 600);
+		setSize(850, 600);
 		setLayout(new BorderLayout());
 		setLocationRelativeTo(null);
 		
@@ -65,9 +66,6 @@ public class TextEditor extends JFrame {
 		add(mainPanel, BorderLayout.CENTER);
 		
 		// 放置主畫面上方 => 工具列
-//		topPanel = new JPanel(new FlowLayout());
-//		topPanel.setLayout(new FlowLayout());
-//		mainPanel.add(topPanel, BorderLayout.NORTH);
 		topPanel = new JToolBar();
 		topPanel.setLayout(new FlowLayout());
 		mainPanel.add(topPanel, BorderLayout.NORTH);
@@ -145,10 +143,12 @@ public class TextEditor extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 	
+	// 取得使用者帳號
 	private void setUserAccount(String UserAccount) {
 		this.UserAccount = UserAccount;
 	}
 	
+	// Listener
 	private void setListener() {
 		// 字體調整
 		fontComboBox.addItemListener(new ItemListener() {
@@ -246,34 +246,37 @@ public class TextEditor extends JFrame {
 		tree.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) { 
 				if (e.isPopupTrigger()) {
-					popupEvent(e); 
+					popupEvent(e);  // 右鍵執行
 				} else if (e.getClickCount() == 2) {
-					loadTabEvent(e); 
+					loadTabEvent(e);  // Double Click
 				}
 			} 
 			
 			// load tab
 			private void loadTabEvent(MouseEvent e) { 
 				JTree tree = (JTree)e.getSource(); 
-				TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+				TreePath path = tree.getPathForLocation(e.getX(), e.getY()); // 取得路徑
 				if (path == null) return; 
 				
-				tree.setSelectionPath(path);	
-				DefaultMutableTreeNode doubleClickedNode = (DefaultMutableTreeNode)path.getLastPathComponent(); 
+				tree.setSelectionPath(path); // 設定Tree的路徑
+				DefaultMutableTreeNode doubleClickedNode = (DefaultMutableTreeNode)path.getLastPathComponent();  
 				
+				// 看選到的是不是葉子 樹分支的尾端
 				if (doubleClickedNode.isLeaf()) {
 					loadTabText();
 			    } 
 			} 			
 			
+			// 右鍵執行
 			private void popupEvent(MouseEvent e) { 
 				JTree tree = (JTree)e.getSource(); 
 				TreePath path = tree.getPathForLocation(e.getX(), e.getY());
 				if (path == null) return; 
 				
-				tree.setSelectionPath(path);	
+				tree.setSelectionPath(path); // 設定Tree的路徑
 				DefaultMutableTreeNode rightClickedNode = (DefaultMutableTreeNode)path.getLastPathComponent(); 
 				
+				// 看選到的是不是葉子 樹分支的尾端
 				if (rightClickedNode.isLeaf()) {
 					JPopupMenu popup = new JPopupMenu();
 					final JMenuItem refreshMenuItem = new JMenuItem("刪除檔案"); 
@@ -281,7 +284,7 @@ public class TextEditor extends JFrame {
 					refreshMenuItem.addActionListener(new ActionListener(){
 						@Override 
 						public void actionPerformed(ActionEvent actionEvent) { 
-							removeTreeNode();
+							removeTreeNode(); // 刪除該節點
 						} 
 				    }); 
 					
@@ -362,10 +365,11 @@ public class TextEditor extends JFrame {
 	// 儲存
 	private void save() {
 		int saveResult = tabbedPane.saveTabs(this.UserAccount);
-		if (saveResult == 1) {
-			
-		} else if (saveResult == 2) {
+		
+		// 2表示新檔案 要新增Tree Node
+		if (saveResult == 2) {
 			tree.addFileTreeNode(tabbedPane.getTextPaneName());
+			JOptionPane.showMessageDialog(null, "儲存成功");
 		}
 	}
 	
@@ -385,7 +389,7 @@ public class TextEditor extends JFrame {
 		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getParent();
 		if (parent != null) {
 			int selectedIndex = parent.getIndex(path);
-			tree.removeFileTreeNode(this.UserAccount, selectedIndex);
+			tree.removeFileTreeNode(this.UserAccount, selectedIndex); // 刪除Node 移除sql內資料
 		}
 	}
 	

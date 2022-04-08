@@ -37,8 +37,11 @@ public class SendEmail extends Thread {
 			MimeMessage generateMailMessage = new MimeMessage(getMailSession); 
 			generateMailMessage.setFrom(new InternetAddress(fromAdmin)); // Create a default MimeMessage object.
 			generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(toUser)); // Set From: header field of the header.
-			generateMailMessage.setSubject("This is the Subject Line!"); // Set Subject: header field
-			generateMailMessage.setText("你的新密碼是：" + this.RandomPasswd + "\n請進入系統重新更改密碼，謝謝"); // Now set the actual message
+			generateMailMessage.setSubject("這裡是MaxTextEditor, 請重新修改密碼"); // Set Subject: header field
+			generateMailMessage.setText(
+					"Hello, 這裡是MaxTextEditor,\n\n" + 
+					"你的新密碼是：" + this.RandomPasswd + 
+					"\n請進入系統重新更改密碼，謝謝"); // Now set the actual message
 			 
 			Transport transport = getMailSession.getTransport("smtp");
 			transport.connect("smtp.gmail.com",587, gmailUser, gmailPasswd);

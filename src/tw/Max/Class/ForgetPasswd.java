@@ -82,7 +82,7 @@ public class ForgetPasswd extends JFrame {
 		submitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				infoUser(); // 發送mail通知使用者
+				mailToUser(); // 發送mail通知使用者
 			}
 		});
 		
@@ -95,7 +95,7 @@ public class ForgetPasswd extends JFrame {
 		});
 	}
 	
-	private void infoUser() {
+	private void mailToUser() {
 		String account = getUserAccount(); // 取得使用者帳號
 		String mail = getUserMail(); // 取得使用者密碼
 		Boolean checkMail = checkMail(account, mail); // 檢查帳號及信箱是否存在
@@ -135,12 +135,12 @@ public class ForgetPasswd extends JFrame {
 		
         for( int i = 0; i < 8; i++ ) {
         	mod = (int)((Math.random() * 7) % 3);
-            if(mod == 1) {    //數字
-            	word[i] = (int)((Math.random() * 10) + 48);
-            } else if(mod == 2) {  //大寫英文
-        		word[i] = (char)((Math.random() * 26) + 65);
-            } else {    //小寫英文
-            	word[i] = (char)((Math.random() * 26) + 97);
+            if(mod == 1) {    
+            	word[i] = (int)((Math.random() * 10) + 48); //數字
+            } else if(mod == 2) {  
+        		word[i] = (char)((Math.random() * 26) + 65); //大寫英文
+            } else {   
+            	word[i] = (char)((Math.random() * 26) + 97);  //小寫英文
             }
          }
 
