@@ -95,6 +95,7 @@ public class ForgetPasswd extends JFrame {
 		});
 	}
 	
+	// 發送mail通知使用者
 	private void mailToUser() {
 		String account = getUserAccount(); // 取得使用者帳號
 		String mail = getUserMail(); // 取得使用者密碼
@@ -133,7 +134,7 @@ public class ForgetPasswd extends JFrame {
         StringBuffer newPassword = new StringBuffer();
 		int mod;
 		
-        for( int i = 0; i < 8; i++ ) {
+        for( int i = 0; i < word.length; i++ ) {
         	mod = (int)((Math.random() * 7) % 3);
             if(mod == 1) {    
             	word[i] = (int)((Math.random() * 10) + 48); //數字
@@ -144,7 +145,7 @@ public class ForgetPasswd extends JFrame {
             }
          }
 
-        for( int j = 0; j < 8; j++ ){
+        for( int j = 0; j < word.length; j++ ){
         	newPassword.append((char)word[j]);
         }
         return newPassword.toString();

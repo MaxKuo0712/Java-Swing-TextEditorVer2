@@ -87,8 +87,8 @@ public class Login extends JFrame {
 				String userAccount = getUserAccount(); // 取得輸入的使用者帳號
 				
 				if (isLoginSuccess) {
-					new TextEditor(userAccount); // 開啟主要程式
 					dispose(); // 登入成功進入主要程式後關閉
+					new TextEditor(userAccount); // 開啟主要程式
 				}
 			}
 		});
@@ -143,7 +143,7 @@ public class Login extends JFrame {
 	}
 	
 	// 取得使用者帳號
-	private String getUserAccount() {
+	public String getUserAccount() {
 		return userAccount.getText();
 	}
 	

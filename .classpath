@@ -16,12 +16,12 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/maxkuo/Desktop/資策會/小專題/TextEditor/javax.mail.jar">
+	<classpathentry kind="lib" path="/Users/maxkuo/Desktop/資策會/小專題/TextEditor/jakarta.activation.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/maxkuo/Desktop/資策會/小專題/TextEditor/jakarta.activation.jar">
+	<classpathentry kind="lib" path="/Users/maxkuo/Desktop/資策會/小專題/TextEditor/javax.mail.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>

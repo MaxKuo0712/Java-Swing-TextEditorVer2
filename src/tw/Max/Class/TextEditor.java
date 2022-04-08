@@ -2,11 +2,7 @@ package tw.Max.Class;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -16,12 +12,10 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -285,6 +279,7 @@ public class TextEditor extends JFrame {
 						@Override 
 						public void actionPerformed(ActionEvent actionEvent) { 
 							removeTreeNode(); // 刪除該節點
+//							removeTabTextPane();
 						} 
 				    }); 
 					
@@ -369,7 +364,6 @@ public class TextEditor extends JFrame {
 		// 2表示新檔案 要新增Tree Node
 		if (saveResult == 2) {
 			tree.addFileTreeNode(tabbedPane.getTextPaneName());
-			JOptionPane.showMessageDialog(null, "儲存成功");
 		}
 	}
 	
@@ -392,6 +386,15 @@ public class TextEditor extends JFrame {
 			tree.removeFileTreeNode(this.UserAccount, selectedIndex); // 刪除Node 移除sql內資料
 		}
 	}
+	
+	private void removeTabTextPane() {
+		DefaultMutableTreeNode path = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getParent();
+		if (parent != null) {
+			int selectedIndex = parent.getIndex(path);
+			String tabName = tree.getNodeName(selectedIndex);
+		}
+	}	
 	
 	// load text
 	private void loadTabText() {
