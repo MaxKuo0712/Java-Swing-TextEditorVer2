@@ -278,8 +278,7 @@ public class TextEditor extends JFrame {
 					refreshMenuItem.addActionListener(new ActionListener(){
 						@Override 
 						public void actionPerformed(ActionEvent actionEvent) { 
-							removeTreeNode(); // 刪除該節點
-//							removeTabTextPane();
+							removeTabAndTree(); // 刪除該節點
 						} 
 				    }); 
 					
@@ -378,23 +377,16 @@ public class TextEditor extends JFrame {
 	}
 	
 	// Remove Tree Node
-	private void removeTreeNode() {
-		DefaultMutableTreeNode path = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getParent();
-		if (parent != null) {
-			int selectedIndex = parent.getIndex(path);
-			tree.removeFileTreeNode(this.UserAccount, selectedIndex); // 刪除Node 移除sql內資料
-		}
-	}
-	
-	private void removeTabTextPane() {
+	private void removeTabAndTree() {
 		DefaultMutableTreeNode path = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 		DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getParent();
 		if (parent != null) {
 			int selectedIndex = parent.getIndex(path);
 			String tabName = tree.getNodeName(selectedIndex);
+			tree.removeFileTreeNode(this.UserAccount, selectedIndex); // 刪除Node 移除sql內資料
+			tabbedPane.removeTab(tabName);
 		}
-	}	
+	}
 	
 	// load text
 	private void loadTabText() {
