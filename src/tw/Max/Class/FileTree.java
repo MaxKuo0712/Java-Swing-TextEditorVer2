@@ -20,7 +20,7 @@ public class FileTree extends JTree {
 		model = new DefaultTreeModel(root);
 		setModel(model);
 		
-		loadsqlTabs(UserAccount);
+		loadsqlTabs(UserAccount); // 開啟視窗時 自動放入檔案 新增Tree Node
 	}
 	
 	// 開啟視窗時 自動放入檔案 新增Tree Node
@@ -29,15 +29,17 @@ public class FileTree extends JTree {
 		LinkedList<String> tabs = sqlQuery.guerySqlShowTabs(UserAccount);
 		
 		for ( int i = 0; i < tabs.size(); i++ ) {
-			addFileTreeNode(tabs.get(i));
+			addFileTreeNode(tabs.get(i)); // 取出LinkedList東西 放入Node
 		}
 	}
 	
+	// 取出LinkedList東西 放入Node
 	public void addFileTreeNode(String tabName) {
 		root.add(new DefaultMutableTreeNode(tabName));
 		setModel(new DefaultTreeModel(root));
 	}
 	
+	// 刪除Node 移除sql內資料
 	public void removeFileTreeNode(String account, int index) {
 		String tabName = getNodeName(index);
 		SQLInsert sqlInsert = new SQLInsert(this.DB, this.Account, this.Password);
@@ -66,6 +68,7 @@ public class FileTree extends JTree {
 		}
 	}
 	
+	// 問User是否要刪除
 	private boolean isDelete() {
 		int isClose = JOptionPane.showConfirmDialog(null, "確定要	刪除該頁籤？", "刪除頁籤", JOptionPane.YES_NO_OPTION);
 		if (isClose == 0) {
@@ -75,6 +78,7 @@ public class FileTree extends JTree {
 		}
 	}
 	
+	// 取得Node名字
 	public String getNodeName(int index) {
 		return root.getChildAt(index).toString();
 	}

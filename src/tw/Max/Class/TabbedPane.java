@@ -6,138 +6,167 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
-public class TabbedPane extends JTabbedPane implements MouseListener {
+public class TabbedPane extends JTabbedPane{
 	private JTextPane textPane;
-	private String UserAccount;
 	private String DB = "MiddleProject";
 	private String Account = "root"; // 取得輸入的帳號
 	private String Password = ""; // 取得輸入的密碼
-	private HashMap<String, String> tabNameMap;
-	private LinkedList<JTextPane> tabList;
+	private String userAccount;
+	private LinkedList<String> tabList;
+	private HashMap<String, JTextPane> currentTabTextPaneMap;
 	
 	// 建構式
 	public TabbedPane(String UserAccount) {
-		// setUserAccount
-		setUserAccount(UserAccount);
-		tabNameMap = new HashMap<>(); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
-		tabList = new LinkedList<>(); // 存下JTextPane
-		addMouseListener(this);
+		this.userAccount = UserAccount;
+		currentTabTextPaneMap = new HashMap<>();
+		tabList = new LinkedList<>();
+		initTabList();
+		setListener(); // Listener
 		
 		// 視窗頁籤
 		setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 	}
 	
-	public void mouseClicked(MouseEvent e) {
-		int removeTabIndex = getUI().tabForCoordinate(this, e.getX(), e.getY());
-	    if (removeTabIndex < 0) return;
-	    
-	    Color tabColor = getBackgroundAt(removeTabIndex);
-	    
-	    if (tabColor == Color.yellow) {
-	    	if (isSaveDB()) {
-	    		closeTab(removeTabIndex, e); // 關閉頁籤
-	    	}
-	    } else {
-			// 當有頁籤存在及User同意關閉才會執行
-			if (getTabCount() > 0 && isDeleteSheet() == true) {
-				closeTab(removeTabIndex, e);
+	private void setListener() {
+		addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) { 
+				if (e.isPopupTrigger()) {
+					popupEvent(e);  // 右鍵執行
+				} else if (e.getClickCount() == 1) {
+					mouseListenerCloseTab(e);
+				}
+			} 
+			
+			private void mouseListenerCloseTab(MouseEvent e) {
+				JTabbedPane tabbedPane = (JTabbedPane)e.getComponent();
+				int removeTabIndex = getUI().tabForCoordinate(tabbedPane, e.getX(), e.getY()); // 取得UI上點擊到的對象index
+			    if (removeTabIndex < 0) return;  // 如果沒點到東西 就return
+			    
+			    Color tabColor = getBackgroundAt(removeTabIndex); // 取得頁籤顏色 用來判斷是否還沒儲存
+			    int tabStatus = 0; // tab儲存的狀態
+			    
+			    // 如果頁籤顏色是黃色 表示還沒儲存 就要問User同不同意直接關閉
+			    if (tabColor == Color.yellow) {
+			    	tabStatus = 0;
+			    	if (isCloseTab(tabStatus)) {
+			    		currentTabTextPaneMap.remove(getTextPaneName());
+			    		closeTab(removeTabIndex, e); // 關閉頁籤
+			    	}
+			    } else {
+			    	tabStatus = 1;
+					// 當有頁籤存在及User同意關閉才會執行
+					if (getTabCount() > 0 && isCloseTab(tabStatus) == true) {
+						currentTabTextPaneMap.remove(getTextPaneName());
+						closeTab(removeTabIndex, e); // 關閉頁籤
+					}
+			    }
 			}
-	    }
-    }
+			
+			// 右鍵執行
+			private void popupEvent(MouseEvent e) { 
+				JTabbedPane tabPane = (JTabbedPane)e.getSource(); 
+
+				JPopupMenu popup = new JPopupMenu();
+				final JMenuItem refreshMenuItem = new JMenuItem("新增檔案"); 
+				
+				refreshMenuItem.addActionListener(new ActionListener(){
+					@Override 
+					public void actionPerformed(ActionEvent actionEvent) { 
+						addNewTabs(); // 刪除該節點
+					} 
+			    }); 
+				
+			    popup.add(refreshMenuItem); 
+			    popup.show(tabPane, e.getX(), e.getY()); 
+			} 
+		});
+	}
+	
+	// 初始化TabList用來判斷頁籤是否重複
+	private void initTabList() {
+		SQLQuery sqlQuery = new SQLQuery(this.DB, this.Account, this.Password);
+		LinkedList<String> tabs = sqlQuery.guerySqlShowTabs(this.userAccount);
+		
+		for ( int i = 0; i < tabs.size(); i++ ) {
+			tabList.push(tabs.get(i));
+		}
+	}
 	
 	// 關閉頁籤
 	private void closeTab(int removeTabIndex, MouseEvent e) {
-	    Rectangle rect=((CloseTabIcon)getIconAt(removeTabIndex)).getBounds();
+	    Rectangle rect = ((CloseTabIcon)getIconAt(removeTabIndex)).getBounds(); // 取得點擊icon的那個頁籤
 	    if (rect.contains(e.getX(), e.getY())) {
 	      this.removeTabAt(removeTabIndex); // 關閉頁籤
 	    }
 	}
-	
-	// 關閉前檢查是否已經儲存
-	private Boolean isSaveDB() {
-		int isClose = JOptionPane.showConfirmDialog(null, "尚未儲存，確定關閉該頁籤？", "關閉頁籤", JOptionPane.YES_NO_OPTION);
-		if (isClose == 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
+
 	// 詢問User是否真的要關閉
-	private boolean isDeleteSheet() {
-		int isClose = JOptionPane.showConfirmDialog(null, "確定要	關閉該頁籤？", "關閉頁籤", JOptionPane.YES_NO_OPTION);
+	private boolean isCloseTab(int tabStatus) {
+		int isClose = 0;
+		if (tabStatus == 0) {
+			isClose = JOptionPane.showConfirmDialog(null, "尚未儲存，確定關閉該頁籤？", "關閉頁籤", JOptionPane.YES_NO_OPTION);
+		} else if (tabStatus == 1) {
+			isClose = JOptionPane.showConfirmDialog(null, "確定關閉該頁籤？", "關閉頁籤", JOptionPane.YES_NO_OPTION);
+		}
 		if (isClose == 0) {
 			return true;
 		} else {
 			return false;
 		}
-	}
-	
-	private void setUserAccount(String UserAccount) {
-		this.UserAccount = UserAccount;
 	}
 	
 	// 新增頁籤
-	public Boolean addNewTabs() {
+	public void addNewTabs() {
 		String tabName = JOptionPane.showInputDialog("請輸入檔案名稱：");
 		tabName = setTabName(tabName); // 先檢查要新增的檔案名稱
-		if (!(tabName == null)) {
-			textPane = new JTextPane();
-			textPane.setName(tabName); // 給予TextPane名字 以便後面使用
-			tabList.add(textPane); // 存下JTextPane
-			tabNameMap.put(tabName, ""); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
+
+		if (tabName != null) {
+			textPane = addNewTextPane(tabName);
+			currentTabTextPaneMap.put(tabName, textPane);
 			addTab(tabName, new CloseTabIcon(null), new JScrollPane(textPane)); // 新增頁籤
 			setSelectedIndex(getTabCount() - 1);  // 新增後, 選擇新增的tab
-			textPane.addCaretListener(new CaretListener() {
-				@Override
-				public void caretUpdate(CaretEvent e) {
-					setBackgroundAt(getSelectedIndex(), Color.yellow);
-				}
-			});
-			return true;
-		} else {
-			return false;
-		}	
+			setTextPaneListener(textPane);
+		}
 	}
 	
 	// 點擊TreeNode時載入頁籤
 	public void loadTabText(String Account, String tabName) {
-		SQLQuery sqlquery = new SQLQuery(this.DB, this.Account, this.Password);
-		JTextPane tabText = sqlquery.guerySqlTabsText(Account, tabName); // sql query 出指定的檔案
-		addDBTabs(tabText); // add 進去頁籤
+		if (!checkTabMap(tabName)) {
+			SQLQuery sqlquery = new SQLQuery(this.DB, this.Account, this.Password);
+			JTextPane tabText = sqlquery.guerySqlTabsText(Account, tabName); // sql query 出指定的檔案
+			addTabs(tabName, tabText); // add 進去頁籤
+		} else {
+			JOptionPane.showMessageDialog(null, "檔案已存在於畫面");
+		}
 	}
 	
 	// 點擊TreeNode時載入頁籤
-	public void addDBTabs(JTextPane tabText) {
-		tabList.add(tabText); // 存下JTextPane
-		tabNameMap.put(tabText.getName(), null); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
-		addTab(tabText.getName(), new CloseTabIcon(null), new JScrollPane(tabText)); // 新增頁籤
+	public void addTabs(String tabName, JTextPane textPane) {
+		currentTabTextPaneMap.put(tabName, textPane);
+		addTab(textPane.getName(), new CloseTabIcon(null), new JScrollPane(textPane)); // 新增頁籤
 		setSelectedIndex(getTabCount() - 1);  // 新增後, 選擇新增的tab
-		tabText.addCaretListener(new CaretListener() {
-			@Override
-			public void caretUpdate(CaretEvent e) {
-				setBackgroundAt(getSelectedIndex(), Color.yellow);
-			}
-		});
+		setTextPaneListener(textPane);
+	}
+
+	private JTextPane addNewTextPane(String tabName) {
+		textPane = new JTextPane();
+		textPane.setName(tabName); // 給予TextPane名字 以便後面使用
+		return textPane;
 	}
 	
-	// 載入頁籤時要新增頁籤及內容
-	public void addTabs(String tabName, byte[] text, File fileRoute) {
-		textPane = new JTextPane();
-		textPane.setText(new String(text)); // 放入檔案內容
-		textPane.setName(tabName); // 給予TextPane名字 以便後面使用
-		tabList.add(textPane); // 存下JTextPane
-		tabNameMap.put(tabName, fileRoute.toString()); // 存頁籤名稱及路徑 Key：頁籤名稱 Value：儲存路徑
-		addTab(tabName, new JScrollPane(textPane)); // 新增頁籤
-		setSelectedIndex(getTabCount() - 1);  // 新增後, 選擇新增的tab
+	private void setTextPaneListener(JTextPane textPane) {
 		textPane.addCaretListener(new CaretListener() {
 			@Override
 			public void caretUpdate(CaretEvent e) {
@@ -146,72 +175,44 @@ public class TabbedPane extends JTabbedPane implements MouseListener {
 		});
 	}
 	
+	private Boolean checkTabMap(String tabName) {
+		return currentTabTextPaneMap.containsKey(tabName);
+	}
+	
 	// 頁籤名稱設置，如果輸入為空, null, 已經存在，則不能建立
 	private String setTabName(String tabName) {
-		int isNamExists = checkNewName(tabName);
-		if (isNamExists == 1) {
-			if (tabName.equals("")) {
-				return "untitled";
+		Boolean isNamExists = checkNewName(tabName);
+		
+		if (isNamExists) {
+			JOptionPane.showMessageDialog(null, "檔案名稱重複！");
+			return null;
+		} else {
+			if (tabName == null || tabName.equals("")) {
+				return null;
 			} else {
 				return tabName;
 			}
-		} else if (isNamExists == 2) {
-			JOptionPane.showMessageDialog(null, "檔案名稱重複！");
-			return null;
-		} else if (isNamExists == 0) {
-			return null;
-		} else {
-			return null;
 		}
 	}
 	
 	// 檢查新頁簽名稱狀況
-	private int checkNewName(String tabName) {
-		if (tabName == null) {
-			return 0;
-		} else if (tabNameMap.get(tabName) == null) {
-			return 1;
+	private Boolean checkNewName(String tabName) {
+		int listIndex = tabList.indexOf(tabName);
+		
+		if (listIndex >= 0) {
+			return true;
 		} else {
-			return 2;
+			return false;
 		}
-	}
-	
-	// 取得文字內容
-	private String getTextPaneText() {
-		return tabList.get(getSelectedIndex()).getText();
-	}
-	
-	// 取的TextArea的名字
-	public String getTextPaneName() {
-		return tabList.get(getSelectedIndex()).getName();
-	}
-	
-	// 取得JTextPane
-	private JTextPane getTextPane() {
-		return tabList.get(getSelectedIndex());
-	}
-	
-	// 取的linkedlist的大小
-	public int getTabSize() {
-		return tabList.size();
-	}
-	
-	// 設置檔案路徑
-	private void setFileRoute(String outputName, String file) {
-		tabNameMap.replace(outputName, file);
-	}
-	
-	// 取得檔案路徑
-	private String getFileRoute(String outputName) {
-		return tabNameMap.get(outputName);
 	}
 	
 	// 匯出檔案
 	public void exportFile() {
+		
 		String outputName = getTextPaneName(); // 取得頁籤名稱
-		String outputText = getTextPaneText(); // 取得頁籤內容
-		byte[] outputByte = outputText.getBytes(); // 字串轉為byte
-
+		JTextPane outputTextPane = getTextPane(outputName);
+		
+		System.out.println(outputName);
 		//彈出檔案選擇框
 		JFileChooser chooser = new JFileChooser();
 		chooser.setDialogTitle("匯出檔案");
@@ -219,13 +220,14 @@ public class TabbedPane extends JTabbedPane implements MouseListener {
 
 		if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {	//假如使用者選擇了儲存
 			File file = chooser.getSelectedFile(); // 取得路徑
-			setFileRoute(outputName, file.toString()); // 把路徑放入HashMap
 			
 			try {
-				FileOutputStream fos = new FileOutputStream(file.toString().concat(".txt")); // 串流 - 設定存文字檔
-				fos.write(outputByte); // 序列化 寫入
-				fos.flush();
-				fos.close();
+				ObjectOutputStream oout = 
+						new ObjectOutputStream(
+							new FileOutputStream(file));
+					oout.writeObject(outputTextPane);
+					oout.flush();
+					oout.close();
 				JOptionPane.showMessageDialog(null, "匯出成功");
 			} catch (Exception e) {
 				System.err.println(e.toString()); // 印出出錯訊息
@@ -245,23 +247,23 @@ public class TabbedPane extends JTabbedPane implements MouseListener {
 		
 		if (isExist) {
 			// update sql
-			if (sqlUpdate.updateTabText(Account, TabName, tabList.get(getSelectedIndex()))) {
-				JOptionPane.showMessageDialog(null, "儲存成功1");
+			if (sqlUpdate.updateTabText(Account, TabName, currentTabTextPaneMap.get(TabName))) {
 				setBackgroundAt(getSelectedIndex(), null); // 存檔成功 顏色回歸正常
+				JOptionPane.showMessageDialog(null, "儲存成功");
 				return 1; // update 不用新增Tree Node
 			} else {
 				JOptionPane.showMessageDialog(null, "儲存失敗");
-				return 0; // insert失敗 要新增Tree Node
+				return 0; // insert失敗
 			}
 		} else {
 			// insert sql
-			if (sqlInsert.insertTabText(Account, TabName, tabList.get(getSelectedIndex()))) {
-				JOptionPane.showMessageDialog(null, "儲存成功2");
+			if (sqlInsert.insertTabText(Account, TabName, currentTabTextPaneMap.get(TabName))) {
 				setBackgroundAt(getSelectedIndex(), null); // 存檔成功 顏色回歸正常
+				JOptionPane.showMessageDialog(null, "儲存成功");
 				return 2; // insert 要新增Tree Node
 			} else {
 				JOptionPane.showMessageDialog(null, "儲存失敗");
-				return 0; // insert失敗 要新增Tree Node
+				return 0; // insert失敗
 			}
 		}
 	}	
@@ -275,19 +277,14 @@ public class TabbedPane extends JTabbedPane implements MouseListener {
 		if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {	//假如使用者選擇了儲存
 			try {
 				File file = chooser.getSelectedFile(); // 取得路徑
-				String fileName = chooser.getName(file);
-				fileName = fileName.substring(0, fileName.lastIndexOf(".")); // 取得去除副檔名的名稱
-				
-				if (tabNameMap.get(fileName) == null) {
-					FileInputStream fin = new FileInputStream(file); // 串流 - 設定存文字檔
-					byte[] text = new byte[ (int) file.length()];
-					fin.read(text); // 序列化 寫入
-					fin.close();
-					addTabs(fileName, text, file);
-					JOptionPane.showMessageDialog(null, "讀取成功");
-				} else {
-					JOptionPane.showMessageDialog(null, "檔案已存在於頁籤");
-				}
+				String tabName = chooser.getName(file);
+				ObjectInputStream oin = 
+						new ObjectInputStream(
+							new FileInputStream(file));
+				Object obj = oin.readObject(); // 讀入 記憶體內佔一塊
+				oin.close();
+				addTabs(tabName, (JTextPane) obj);
+				JOptionPane.showMessageDialog(null, "讀取成功");
 			} catch (Exception e) {
 				System.err.println(e.toString()); // 印出出錯訊息
 				e.printStackTrace(); // 印出出錯位置
@@ -298,8 +295,9 @@ public class TabbedPane extends JTabbedPane implements MouseListener {
 	// 設定TextPane背景顏色
 	public void setBackgroundColor() {
 		if (getTabCount() > 0) {
+			String tabName = getTextPaneName();
 			Color color = JColorChooser.showDialog(new JFrame("設定背景顏色"), "選取顏色", null); // 呼叫內建JColorChooser
-			getTextPane().setBackground(color); // 設定TextPane背景顏色
+			getTextPane(tabName).setBackground(color); // 設定TextPane背景顏色
 		}
 	}
 	
@@ -311,41 +309,38 @@ public class TabbedPane extends JTabbedPane implements MouseListener {
 
 		if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {	//假如使用者選擇了儲存
 			try {
+				String tabName = getTextPaneName();
 				String path = chooser.getSelectedFile().getPath(); // 取得路徑
 				BufferedImage inputPic = ImageIO.read(new File(path)); // 取得圖片
 				ImageIcon a = new ImageIcon(inputPic); 
-				getTextPane().insertIcon(a); // textPane內放入圖片
+				getTextPane(tabName).insertIcon(a); // textPane內放入圖片
 			} catch (Exception e) {
 				System.err.println(e.toString()); // 印出出錯訊息
 				e.printStackTrace(); // 印出出錯位置
 			}	
 		}
 	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+	
+	public void removeTab(String tabName) {
+		int tabIndex = indexOfTab(tabName);
+		remove(tabIndex);
+		currentTabTextPaneMap.remove(tabName);
 	}
 
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+	// 取的TextArea的名字
+	public String getTextPaneName() {
+		return getTitleAt(getSelectedIndex());
 	}
 	
+	// 取得JTextPane
+	private JTextPane getTextPane(String tabName) {
+		return currentTabTextPaneMap.get(tabName);
+	}
+	
+	// 取的linkedlist的大小
+	public int getTabSize() {
+		return currentTabTextPaneMap.size();
+	}
 }
 
 class CloseTabIcon implements Icon {

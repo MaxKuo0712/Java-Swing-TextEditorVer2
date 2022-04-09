@@ -1,20 +1,8 @@
 package tw.Max.Class;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
-import javax.swing.JTextPane;
 
 public class SQLDelete {
 	private String DB;
@@ -27,10 +15,12 @@ public class SQLDelete {
 		this.Passwd = Passwd;
 	}
 	
+	// 刪除檔案
 	public Boolean deleteTabText(String account, String textName) {
 		return deleteText(account, textName);
 	}
-
+	
+	// 刪除檔案
 	private Boolean deleteText(String account, String textName) {
 		String DB = this.DB;
 		String User = this.User;
@@ -55,7 +45,7 @@ public class SQLDelete {
 				return false;
 			}
 		} catch (Exception e) {
-			System.out.println(e.toString());
+			e.printStackTrace();
 			return false;
 		}
 	}

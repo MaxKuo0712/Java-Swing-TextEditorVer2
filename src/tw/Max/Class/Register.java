@@ -1,16 +1,13 @@
 package tw.Max.Class;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+
 import java.util.Date;
-import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -22,7 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import org.jdatepicker.JDatePanel;
 import org.jdatepicker.JDatePicker;
 
 public class Register extends JFrame {
@@ -166,8 +162,10 @@ public class Register extends JFrame {
 		submitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				Boolean isCreateSuccess = createAccount();
+				
 				// sql insert帳號資料
-				if (createAccount()) {
+				if (isCreateSuccess) {
 					JOptionPane.showMessageDialog(null, "歡迎加入！");
 					dispose();
 				} else {
@@ -207,7 +205,7 @@ public class Register extends JFrame {
 		String birth = getBirth();
 		String mail = getMail();
 		String tel = getTel();
-		
+
 		// 執行insert並回傳結果
 		if (sqlInsert.insertCreateAccount(name, idNumber, account, passwd, gender, birth, mail, tel)) {
 			return true;
@@ -244,26 +242,33 @@ public class Register extends JFrame {
 	}
 	
 	private String getBirth() {
-		SimpleDateFormat f1 = new SimpleDateFormat("yyyy-MM-dd");
-		int year = birthDatePicker.getModel().getYear();
-		int month = birthDatePicker.getModel().getMonth();
-		int day = birthDatePicker.getModel().getDay();
-		LocalDate targetDate = LocalDate.of(year, month, day);
-		Instant instant = targetDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
-		Date birthDate = Date.from(instant);
-		
-		if (targetDate.isBefore(LocalDate.now())) {
-			return f1.format(birthDate);
-		} else {
-			JOptionPane.showMessageDialog(null, "請輸入正確出生日期");
+		try {
+			SimpleDateFormat f1 = new SimpleDateFormat("yyyy-MM-dd");
+			
+			long miliseconds = System.currentTimeMillis();
+	        java.sql.Date today = new java.sql.Date(miliseconds); // 利用sql取得無時間的日期
+	        
+			Object datePicker = birthDatePicker.getModel().getValue(); // 取得DatePicker的生日日期
+			Date birthDate = f1.parse(f1.format(datePicker)); // 轉為Date 用來比對
+
+			if (birthDate.before(today)) {
+				return f1.format(birthDate);
+			} else {
+				JOptionPane.showMessageDialog(null, "請輸入正確出生日期");
+				return null;
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
 	
+	// 取得使用者的mail
 	private String getMail() {
 		return emailField.getText();
 	}
 	
+	// 取得電話
 	private String getTel() {
 		return telField.getText();
 	}
