@@ -4,4 +4,5 @@ module MiddleProject_TextEditor {
 	requires jdatepicker;
 	requires mysql.connector.java;
 	requires java.mail;
+	requires org.json;
 }
