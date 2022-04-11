@@ -103,7 +103,7 @@ public class ForgetPasswd extends JFrame {
 		
 		if (checkMail) {
 			String randomPasswd = getRandomPasswd(); // 取得產生的亂數密碼
-			SendEmail sendEmail = new SendEmail(mail, randomPasswd); // 寄mail class
+			SendGmailOAuth sendEmail = new SendGmailOAuth(mail, randomPasswd); // 寄mail class
 			sendEmail.start(); // 因為寄送mail需要時間 所以用執行緒方式處理 在前端的感受上較佳
 			setNewRandomPasswd(account, randomPasswd); // update新密碼進資料庫
 			dispose(); // 關密忘記密碼的視窗
