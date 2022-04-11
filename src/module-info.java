@@ -5,4 +5,5 @@ module MiddleProject_TextEditor {
 	requires mysql.connector.java;
 	requires java.mail;
 	requires org.json;
+	requires jackson;
 }

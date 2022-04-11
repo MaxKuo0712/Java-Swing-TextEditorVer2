@@ -323,8 +323,10 @@ public class TabbedPane extends JTabbedPane{
 	
 	public void removeTab(String tabName) {
 		int tabIndex = indexOfTab(tabName);
-		remove(tabIndex);
-		currentTabTextPaneMap.remove(tabName);
+		if (tabIndex >= 0) {
+			remove(tabIndex);
+			currentTabTextPaneMap.remove(tabName);
+		}
 	}
 
 	// 取的TextArea的名字
