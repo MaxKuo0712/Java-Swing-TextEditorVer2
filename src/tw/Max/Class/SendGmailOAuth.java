@@ -140,8 +140,6 @@ public class SendGmailOAuth extends Thread {
 		        conn.connect();
 		        try {
 		            HashMap<String, Object> result;
-//		            System.out.println(conn.getInputStream());
-		            
 		            result = new ObjectMapper().readValue(conn.getInputStream(), new TypeReference<HashMap<String, Object>>() {});
 		            accessToken = (String) result.get("access_token");
 		            refreshToken = (String) result.get("refresh_token");
